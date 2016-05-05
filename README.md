@@ -1,4 +1,6 @@
-# PyFactEl
+# PyFactEl-Simu
+
+(PyFactEl en mode simulation)
 
 - installer Python 3 (https://www.python.org/downloads/)
     si l'option "rajouter Python au PATH" se présente, la cocher
@@ -19,7 +21,7 @@ Le dossier 'paramètres' contient les classes servant à l'importation des param
 Le dossier 'traitement' contient les classes servant à la fabrication de la facture, du bilan et des annexes, ainsi que 
 le fichier 'rabais.py' servant au calcul des rabais
 
-Le dossier de travail doit contenir les fiichiers suivants (noms modifiables dans le code au besoin) :
+Le dossier de travail doit contenir les fichiers suivants (noms modifiables dans le code au besoin) :
 
     - cae.csv 
     - client.csv

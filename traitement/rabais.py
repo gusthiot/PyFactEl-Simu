@@ -11,7 +11,7 @@ class Rabais(object):
         calcule le rabais de réservation
         :param drsf: délai sans frais pour une machine donnée
         :param supp: durée ouvrée
-        :param shp: durée su slot réservée en heures pleines
+        :param shp: durée du slot réservée en heures pleines
         :param shc: durée du slot réservée en heures creuses
         :return: durée facturée en heures pleines, durée facturée en heures creuses
         """
@@ -52,15 +52,28 @@ class Rabais(object):
         return somme_eq, somme_sb, somme_t, em, er0, er
 
     @staticmethod
-    def rabais_plafonnement(somme_j_pm, s, k):
+    def rabais_plafonnement(somme_j_pu, s, k):
         """
         calcule le rabais sur plafonnement
-        :param somme_j_pm: somme par compte des machines plafonnées
+        :param somme_j_pu: somme par compte des machines plafonnées
         :param s: seuil
         :param k: pourcentage appliqué après le seuil
         :return: rabais sur montant plafonné, sur montant non-plafonné, sur main d'oeuvre opérateur
         """
-        prj = -min(0, min(somme_j_pm, s) + k * max(0, somme_j_pm - s) - somme_j_pm)
+        prj = -min(0, min(somme_j_pu, s) + k * max(0, somme_j_pu - s) - somme_j_pu)
         qrj = 0
         orj = 0
         return prj, qrj, orj
+
+    @staticmethod
+    def rabais_reservation_petit_montant(rm, rmin):
+        """
+        si le montant ne dépasse pas un seuil minimum, un rabais égal à ce montant est appliqué
+        :param rm: montant
+        :param rmin: seuil
+        :return: rabais
+        """
+        if rm < int(rmin):
+            return rm
+        else:
+            return 0

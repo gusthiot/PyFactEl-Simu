@@ -1,5 +1,3 @@
-import csv
-import sys
 from outils import Outils
 from erreurs import ErreurConsistance
 from collections import namedtuple
@@ -16,8 +14,8 @@ class Generaux(object):
     nom_fichier = "paramgen.csv"
     libelle = "Paramètres Généraux"
     cles_obligatoires = ['origine', 'code_int', 'code_ext', 'commerciale', 'canal', 'secteur', 'devise', 'financier', 'fonds',
-            'entete', 'poste_emolument', 'lien', 'chemin', 'code_t', 'code_n', 'nature_client', 'code_d', 'code_sap', 'quantite',
-            'unite', 'type_prix', 'type_rabais', 'texte_sap', 'modes']
+            'entete', 'poste_emolument', 'poste_reservation',  'lien', 'chemin', 'code_t', 'code_n', 'nature_client', 'code_d', 'code_sap', 'quantite',
+            'unite', 'type_prix', 'type_rabais', 'texte_sap', 'modes', 'min_fact_rese']
     cles_autorisees = cles_obligatoires + ['code_sap_qas']
 
     def __init__(self, dossier_source, prod2qual=None):
@@ -55,6 +53,12 @@ class Generaux(object):
                 int(quantite)
         except ValueError:
             erreurs += "les quantités doivent être des nombres entiers\n"
+
+        try:
+            self._donnees['min_fact_rese'][1] = int(self._donnees['min_fact_rese'][1])
+        except ValueError:
+            erreurs += "le montant minimum pour des frais de facturation doit être un nombre\n"
+
         codes_n = []
         for nn in self._donnees['code_n'][1:]:
             if nn not in codes_n:
@@ -100,7 +104,7 @@ class Generaux(object):
     def articles(self):
         """renvoie la liste des articles de facturation.
 
-        Le premier (émolument) s'appelle "D1"; les deux seconds (prix
+        Les 2 premiers (émolument, réservation) s'appellent "D1"; les deux seconds (prix
         plafonnés / non plafonnés) s'appellent "D2"; les suivants (en nombre
         variable) s'appellent "D3".
 
@@ -120,7 +124,7 @@ class Generaux(object):
 
         :return: une liste ordonnée d'objets Article
         """
-        return self.articles[3:]
+        return self.articles[4:]
 
     def codes_d3(self):
         return [a.code_d for a in self.articles_d3]
@@ -128,6 +132,7 @@ class Generaux(object):
     def nature_client_par_code_n(self, nature_client):
         return self._donnees['nature_client'][
             self._donnees['code_n'].index(nature_client)]
+
 
 def ajoute_accesseur_pour_valeur_unique(cls, nom, cle_csv=None):
     if cle_csv is None:
@@ -138,9 +143,9 @@ def ajoute_accesseur_pour_valeur_unique(cls, nom, cle_csv=None):
 
 ajoute_accesseur_pour_valeur_unique(Generaux, "centre_financier", "financier")
 
-for champ_valeur_unique in ('fonds', 'entete', 'chemin', 'lien',
+for champ_valeur_unique in ('fonds', 'entete', 'chemin', 'lien', 'min_fact_rese',
                             'poste_emolument', 'devise', 'canal', 'secteur',
-                            'origine', 'commerciale',
+                            'origine', 'commerciale', 'poste_reservation',
                             'code_int', 'code_ext', 'code_t'):
     ajoute_accesseur_pour_valeur_unique(Generaux, champ_valeur_unique)
 

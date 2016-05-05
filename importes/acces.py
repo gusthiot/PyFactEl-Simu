@@ -17,6 +17,7 @@ class Acces(Fichier):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.comptes = {}
+        self.sommes = {}
 
     def obtenir_comptes(self):
         """
@@ -115,9 +116,12 @@ class Acces(Fichier):
 
         donnees_list = []
         for donnee in self.donnees:
-            compte = comptes.donnees[donnee['id_compte']]
-            machine = machines.donnees[donnee['id_machine']]
-            client = clients.donnees[compte['code_client']]
+            id_compte = donnee['id_compte']
+            compte = comptes.donnees[id_compte]
+            code_client = compte['code_client']
+            id_machine = donnee['id_machine']
+            machine = machines.donnees[id_machine]
+            client = clients.donnees[code_client]
             coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
 
             donnee['pu'] = round(donnee['duree_machine_hp'] / 60 * round(machine['t_h_machine_hp_p'] *
@@ -134,6 +138,18 @@ class Acces(Fichier):
                                  round(machine['t_h_operateur_hp_mo'] * coefmachine['coef_mo'], 2) +
                                  donnee['duree_operateur_hc'] / 60 *
                                  round(machine['t_h_operateur_hc_mo'] * coefmachine['coef_mo']), 2)
+
+            if code_client not in self.sommes:
+                self.sommes[code_client] = {}
+            scl = self.sommes[code_client]
+            if id_compte not in scl:
+                scl[id_compte] = {}
+            sco = scl[id_compte]
+            if id_machine not in sco:
+                sco[id_machine] = {'duree_hp': donnee['duree_machine_hp'], 'duree_hc': donnee['duree_machine_hc']}
+            else:
+                sco[id_machine]["duree_hp"] += donnee['duree_machine_hp']
+                sco[id_machine]['duree_hc'] += donnee['duree_machine_hc']
 
             donnees_list.append(donnee)
         self.donnees = donnees_list

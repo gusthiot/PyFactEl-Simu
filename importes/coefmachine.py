@@ -8,7 +8,7 @@ class CoefMachine(Fichier):
     """
 
     nom_fichier = "coeffmachine.csv"
-    cles = ['annee', 'mois', 'id_classe_tarif', 'intitule', 'categorie', 'coef_p', 'coef_np', 'coef_mo']
+    cles = ['annee', 'mois', 'id_classe_tarif', 'intitule', 'categorie', 'coef_p', 'coef_np', 'coef_mo', 'coef_r']
     libelle = "Coefficients Machines"
 
     def __init__(self, *args, **kwargs):
@@ -92,6 +92,8 @@ class CoefMachine(Fichier):
             donnee['coef_np'], info = Outils.est_un_nombre(donnee['coef_np'], "le coefficient NP", ligne)
             msg += info
             donnee['coef_mo'], info = Outils.est_un_nombre(donnee['coef_mo'], "le coefficient MO", ligne)
+            msg += info
+            donnee['coef_r'], info = Outils.est_un_nombre(donnee['coef_r'], "le coefficient R", ligne)
             msg += info
 
             ligne += 1

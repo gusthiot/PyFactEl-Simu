@@ -89,7 +89,7 @@ class Facture(object):
                 client = sommes.sommes_clients[code_client]
                 cl = clients.donnees[code_client]
 
-                tot = client['somme_t_pm'] + client['somme_t_nm']
+                tot = client['somme_t_pu'] + client['somme_t_nm']
                 for categorie in generaux.codes_d3():
                     tot += client['sommes_cat_m'][categorie]
                 if tot == 0 and client['e'] == 0:
@@ -156,6 +156,12 @@ class Facture(object):
                     fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[0], poste, client['em'], client['er'],
                                                                   op_centre, "", edition))
                     contenu_client += self.ligne_tableau(generaux.articles[0], poste, client['em'], client['er'], "", edition)
+
+                if client['r'] > 0:
+                    poste = generaux.poste_reservation
+                    fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[1], poste, client['rm'], client['rr'],
+                                                               op_centre, "", edition))
+                    contenu_client += self.ligne_tableau(generaux._articles[1], poste, client['rm'], client['rr'], "", edition)
     
                 inc = 1
                 client_comptes = sommes.sommes_comptes[code_client]
@@ -164,19 +170,19 @@ class Facture(object):
                     co = comptes.donnees[id_compte]
                     if compte['si_facture'] > 0:
                         poste = inc*10
-                        if compte['somme_j_pm'] > 0:
-                            fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[1],
-                                                                       poste, compte['somme_j_pm'],
+                        if compte['somme_j_pu'] > 0:
+                            fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[2],
+                                                                       poste, compte['somme_j_pu'],
                                                                        compte['prj'], op_centre, co['intitule'], edition))
-                            contenu_client += self.ligne_tableau(generaux.articles[1], poste, compte['somme_j_pm'],
+                            contenu_client += self.ligne_tableau(generaux.articles[2], poste, compte['somme_j_pu'],
                                                                      compte['prj'], co['intitule'], edition)
                             poste += 1
     
                         if compte['somme_j_nm'] > 0:
-                            fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[2],
+                            fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[3],
                                                                        poste, compte['somme_j_nm'],
                                                                         compte['nrj'], op_centre, co['intitule'], edition))
-                            contenu_client += self.ligne_tableau(generaux.articles[2], poste, compte['somme_j_nm'],
+                            contenu_client += self.ligne_tableau(generaux.articles[3], poste, compte['somme_j_nm'],
                                                                      compte['nrj'], co['intitule'], edition)
                             poste += 1
     

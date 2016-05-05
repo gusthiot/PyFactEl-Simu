@@ -9,7 +9,7 @@ class Reservation(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_compte', 'intitule_compte', 'code_client', 'abrev_labo', 'id_user', 'nom_user',
-            'prenom_user', 'num_projet', 'intitule_projet', 'id_machine', 'nom_machine', 'date_debut', 'duree_hp',
+            'prenom_user', 'id_machine', 'nom_machine', 'date_debut', 'duree_hp',
             'duree_hc', 'si_supprime', 'duree_ouvree', 'date_reservation', 'date_suppression']
     nom_fichier = "res.csv"
     libelle = "Réservation Equipement"
@@ -17,6 +17,7 @@ class Reservation(Fichier):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.comptes = {}
+        self.sommes = {}
 
     def obtenir_comptes(self):
         """
@@ -108,39 +109,57 @@ class Reservation(Fichier):
 
         donnees_list = []
         for donnee in self.donnees:
-            compte = comptes.donnees[donnee['id_compte']]
-            machine = machines.donnees[donnee['id_machine']]
-            client = clients.donnees[compte['code_client']]
+
+            id_compte = donnee['id_compte']
+            compte = comptes.donnees[id_compte]
+            code_client = compte['code_client']
+            id_machine = donnee['id_machine']
+            machine = machines.donnees[id_machine]
+            client = clients.donnees[code_client]
             coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
             duree_fact_hp, duree_fact_hc = Rabais.rabais_reservation(machine['delai_sans_frais'],
                                                                      donnee['duree_ouvree'],
                                                                      donnee['duree_hp'],
                                                                      donnee['duree_hc'])
 
-            donnee['pv'] = round(duree_fact_hp / 60 * round(machine['t_h_reservation_hp_p'] *
-                                                            coefmachine['coef_p'], 2) + duree_fact_hc / 60 *
-                                 round(machine['t_h_reservation_hc_p'] * coefmachine['coef_p']), 2)
+            if code_client not in self.sommes:
+                self.sommes[code_client] = {}
+            scl = self.sommes[code_client]
+            if id_compte not in scl:
+                scl[id_compte] = {}
+            sco = scl[id_compte]
+            if id_machine not in sco:
+                sco[id_machine] = {'res_hp': 0, 'ann_hp': 0,
+                                'res_hc': 0, 'ann_hc': 0}
 
-            donnee['qv'] = round(duree_fact_hp / 60 * round(machine['t_h_reservation_hp_np'] *
-                                                            coefmachine['coef_np'], 2) + duree_fact_hc / 60 *
-                                 round(machine['t_h_reservation_hc_np'] * coefmachine['coef_np']), 2)
+            if donnee['si_supprime'] == 'OUI':
+                sco[id_machine]['ann_hp'] += duree_fact_hp
+                sco[id_machine]['ann_hc'] += duree_fact_hc
+            else:
+                sco[id_machine]['res_hp'] += duree_fact_hp
+                sco[id_machine]['res_hc'] += duree_fact_hc
+
+            if id_machine not in scl:
+                pu_hp = round(coefmachine['coef_r'] * machine['t_h_reservation_hp'], 2)
+                pu_hc = round(coefmachine['coef_r'] * machine['t_h_reservation_hc'], 2)
+                scl[id_machine] = {'pu_hp': pu_hp, 'pu_hc': pu_hc}
 
             donnee['duree_fact_hp'] = duree_fact_hp
             donnee['duree_fact_hc'] = duree_fact_hc
+
             donnees_list.append(donnee)
+
         self.donnees = donnees_list
 
-    def reservations_pour_projet(self, num_projet, id_compte, code_client):
+    def reservations_pour_compte(self, id_compte, code_client):
         """
-        retourne toutes les données réservations pour un projet donné
-        :param num_projet: le numéro du projet
+        retourne toutes les données réservations pour un compte donné
         :param id_compte: l'id du compte
         :param code_client: le code du client
-        :return: toutes les données réservations le un projet donné
+        :return: toutes les données réservations d'un compte donné
         """
         donnees_list = []
         for donnee in self.donnees:
-            if (donnee['id_compte'] == id_compte) and (donnee['code_client'] == code_client) \
-                    and (donnee['num_projet'] == num_projet):
+            if (donnee['id_compte'] == id_compte) and (donnee['code_client'] == code_client):
                 donnees_list.append(donnee)
         return donnees_list

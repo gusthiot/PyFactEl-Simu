@@ -8,8 +8,8 @@ class Machine(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_machine', 'nom', 'categorie', 't_h_machine_hp_p', 't_h_machine_hp_np',
-            't_h_operateur_hp_mo', 't_h_reservation_hp_p', 't_h_reservation_hp_np', 't_h_machine_hc_p',
-            't_h_machine_hc_np', 't_h_operateur_hc_mo', 't_h_reservation_hc_p', 't_h_reservation_hc_np',
+            't_h_operateur_hp_mo', 'tx_occ_eff_hp', 't_h_reservation_hp', 't_h_machine_hc_p',
+            't_h_machine_hc_np', 't_h_operateur_hc_mo', 'tx_occ_eff_hc', 't_h_reservation_hc',
             'delai_sans_frais']
     nom_fichier = "machine.csv"
     libelle = "Machines"
@@ -82,11 +82,11 @@ class Machine(Fichier):
             donnee['t_h_operateur_hp_mo'], info = Outils.est_un_nombre(donnee['t_h_operateur_hp_mo'],
                                                                        "le tarif opérateur HP MO", ligne)
             msg += info
-            donnee['t_h_reservation_hp_p'], info = Outils.est_un_nombre(donnee['t_h_reservation_hp_p'],
-                                                                        "le tarif réservation HP P", ligne)
+            donnee['tx_occ_eff_hp'], info = Outils.est_un_nombre(donnee['tx_occ_eff_hp'],
+                                                                        "le taux effectif d'occupation HP", ligne)
             msg += info
-            donnee['t_h_reservation_hp_np'], info = Outils.est_un_nombre(donnee['t_h_reservation_hp_np'],
-                                                                         "le tarif réservation HP NP", ligne)
+            donnee['t_h_reservation_hp'], info = Outils.est_un_nombre(donnee['t_h_reservation_hp'],
+                                                                         "le tarif réservation HP", ligne)
             msg += info
             donnee['t_h_machine_hc_p'], info = Outils.est_un_nombre(donnee['t_h_machine_hc_p'], "le tarif machine HC P",
                                                                     ligne)
@@ -97,11 +97,11 @@ class Machine(Fichier):
             donnee['t_h_operateur_hc_mo'], info = Outils.est_un_nombre(donnee['t_h_operateur_hc_mo'],
                                                                        "le tarif opérateur HC MO", ligne)
             msg += info
-            donnee['t_h_reservation_hc_p'], info = Outils.est_un_nombre(donnee['t_h_reservation_hc_p'],
-                                                                        "le tarif réservation HC P", ligne)
+            donnee['tx_occ_eff_hc'], info = Outils.est_un_nombre(donnee['tx_occ_eff_hc'],
+                                                                        "le taux effectif d'occupation HC", ligne)
             msg += info
-            donnee['t_h_reservation_hc_np'], info = Outils.est_un_nombre(donnee['t_h_reservation_hc_np'],
-                                                                         "le tarif réservation HC NP", ligne)
+            donnee['t_h_reservation_hc'], info = Outils.est_un_nombre(donnee['t_h_reservation_hc'],
+                                                                         "le tarif réservation HC", ligne)
             msg += info
             donnee['delai_sans_frais'], info = Outils.est_un_nombre(donnee['delai_sans_frais'], "le délai sans frais",
                                                                     ligne)
