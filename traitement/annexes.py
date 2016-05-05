@@ -209,17 +209,49 @@ class Annexes(object):
             client_compte_projet = sommes.sommes_projets[code_client][id_compte]
             contenu_projet = ""
 
+            # machines_utilisees = {}
+
+            # ## RES
+            structure_res = r'''{|l|l|l|l|l|l|}'''
+            dico_res = {'compte': intitule_compte}
+            contenu_res = r'''
+                \hline
+                \multicolumn{3}{|l|}{%(compte)s} & & \multicolumn{2}{l|}{hh:mm} \\
+                \hline
+                Date & Heure & Equipement & & slot & fact. \\
+                \hline
+                ''' % dico_res
+            nombre_res = 0
+            legende_res = r'''Récapitulatif Réservations : ''' + intitule_compte
+
+            res_proj = reservations.reservations_pour_compte(id_compte, code_client)
+            for res in res_proj:
+                nombre_res += 1
+                # if res['id_machine'] not in machines_utilisees:
+                #     machines_utilisees[res['id_machine']] = {'machine': res['nom_machine'], 'usage_hp': 0,
+                #                                              'reservation_hp': 0, 'facture_hp': 0, 'usage_hc': 0,
+                #                                              'reservation_hc': 0, 'facture_hc': 0}
+                # machines_utilisees[res['id_machine']]['reservation_hp'] += res['duree_hp']
+                # machines_utilisees[res['id_machine']]['reservation_hc'] += res['duree_hc']
+                # machines_utilisees[res['id_machine']]['facture_hp'] += res['duree_fact_hp']
+                # machines_utilisees[res['id_machine']]['facture_hc'] += res['duree_fact_hc']
+                ligne = Annexes.ligne_res(res)
+                contenu_res += ligne
+
+            contenu_rsv = ""
+            if nombre_res > 0:
+                contenu_rsv = Latex.long_tableau(contenu_res, structure_res, legende_res)
+            # ## res
+
             for num_projet in sorted(client_compte_projet.keys()):
                 # ## PROJET
                 sp = sommes.sommes_projets[code_client][id_compte][num_projet]
                 intitule_projet = num_projet + " - " + Latex.echappe_caracteres(sp['intitule'])
 
-                machines_utilisees = {}
-
-                dico_recap_projet = {'num': intitule_projet, 'plafond': "%.2f" % sp['somme_p_pm'],
+                dico_recap_projet = {'num': intitule_projet, 'plafond': "%.2f" % sp['somme_p_pu'],
                                      'non_plafond': "%.2f" % sp['somme_p_nm']}
 
-                total = sp['somme_p_pm'] + sp['somme_p_nm']
+                total = sp['somme_p_pu'] + sp['somme_p_nm']
 
                 contenu_recap_projet += r'''
                     \hline
@@ -254,12 +286,12 @@ class Annexes(object):
                 resultats = [0, 0, 0]
                 for cae in cae_proj:
                     nombre_cae += 1
-                    if cae['id_machine'] not in machines_utilisees:
-                        machines_utilisees[cae['id_machine']] = {'machine': cae['nom_machine'], 'usage_hp': 0,
-                                                                 'reservation_hp': 0, 'facture_hp': 0, 'usage_hc': 0,
-                                                                 'reservation_hc': 0, 'facture_hc': 0}
-                    machines_utilisees[cae['id_machine']]['usage_hp'] += cae['duree_machine_hp']
-                    machines_utilisees[cae['id_machine']]['usage_hc'] += cae['duree_machine_hc']
+                    # if cae['id_machine'] not in machines_utilisees:
+                    #     machines_utilisees[cae['id_machine']] = {'machine': cae['nom_machine'], 'usage_hp': 0,
+                    #                                              'reservation_hp': 0, 'facture_hp': 0, 'usage_hc': 0,
+                    #                                              'reservation_hc': 0, 'facture_hc': 0}
+                    # machines_utilisees[cae['id_machine']]['usage_hp'] += cae['duree_machine_hp']
+                    # machines_utilisees[cae['id_machine']]['usage_hc'] += cae['duree_machine_hc']
                     machine = machines.donnees[cae['id_machine']]
                     coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
                     ligne, resultat = Annexes.ligne_cae(cae, machine, coefmachine)
@@ -278,48 +310,6 @@ class Annexes(object):
                 if nombre_cae > 0:
                     contenu_projet += Latex.long_tableau(contenu_cae, structure_cae, legende_cae)
                 # ## cae
-
-                # ## RES
-                structure_res = r'''{|l|l|l|l|l|l||r|r||r|r|}'''
-                dico_res = {'compte': intitule_compte, 'projet': intitule_projet}
-                contenu_res = r'''
-                    \hline
-                    \multicolumn{3}{|l|}{%(compte)s / %(projet)s} & & \multicolumn{2}{l||}{hh:mm} &
-                    \multicolumn{2}{l||}{CHF/h} & \multicolumn{2}{l|}{CHF} \\
-                    \hline
-                    Date & Heure & Equipement & & slot & fact. & \multicolumn{1}{l|}{P} & \multicolumn{1}{l||}{NP}
-                    & \multicolumn{1}{l|}{P} & \multicolumn{1}{l|}{NP} \\
-                    \hline
-                    ''' % dico_res
-                nombre_res = 0
-                legende_res = r'''Récapitulatif Réservations : ''' + intitule_compte + r''' / ''' + intitule_projet
-
-                res_proj = reservations.reservations_pour_projet(num_projet, id_compte, code_client)
-                resultats = [0, 0]
-                for res in res_proj:
-                    nombre_res += 1
-                    if res['id_machine'] not in machines_utilisees:
-                        machines_utilisees[res['id_machine']] = {'machine': res['nom_machine'], 'usage_hp': 0,
-                                                                 'reservation_hp': 0, 'facture_hp': 0, 'usage_hc': 0,
-                                                                 'reservation_hc': 0, 'facture_hc': 0}
-                    machines_utilisees[res['id_machine']]['reservation_hp'] += res['duree_hp']
-                    machines_utilisees[res['id_machine']]['reservation_hc'] += res['duree_hc']
-                    machines_utilisees[res['id_machine']]['facture_hp'] += res['duree_fact_hp']
-                    machines_utilisees[res['id_machine']]['facture_hc'] += res['duree_fact_hc']
-                    ligne, resultat = Annexes.ligne_res(res, machines.donnees[res['id_machine']])
-                    resultats[0] += resultat[0]
-                    resultats[1] += resultat[1]
-                    contenu_res += ligne
-
-                contenu_res += r'''
-                    \multicolumn{8}{|r||}{Total} & ''' + Outils.format_si_nul(resultats[0]) + r'''
-                    & ''' + Outils.format_si_nul(resultats[1]) + r'''\\
-                    \hline
-                    '''
-
-                if nombre_res > 0:
-                    contenu_projet += Latex.long_tableau(contenu_res, structure_res, legende_res)
-                # ## res
 
                 # ## LIV
                 structure_liv = r'''{|l|l|l|l|r|r|r|r|}'''
@@ -355,7 +345,7 @@ class Annexes(object):
                 if nombre_liv > 0:
                     contenu_projet += Latex.long_tableau(contenu_liv, structure_liv, legende_liv)
                 # ## liv
-
+                """
                 if nombre_cae > 0 or nombre_res > 0:
                     structure_stat_machines = r'''{|l|l|l|l|l|}'''
                     legende_stat_machines = r'''Statistiques de réservation/utilisation par machine : ''' + \
@@ -389,12 +379,12 @@ class Annexes(object):
 
                     contenu_projet += Latex.tableau(contenu_stat_machines, structure_stat_machines,
                                                     legende_stat_machines)
-
+                """
                 # ## projet
 
             sco = sommes.sommes_comptes[code_client][id_compte]
 
-            dico_recap_projet = {'plafond': "%.2f" % sco['somme_j_pm'], 'non_plafond': "%.2f" % sco['somme_j_nm'],
+            dico_recap_projet = {'plafond': "%.2f" % sco['somme_j_pu'], 'non_plafond': "%.2f" % sco['somme_j_nm'],
                                  'prj': "%.2f" % sco['prj'], 'nrj': "%.2f" % sco['nrj'], 'pj': "%.2f" % sco['pj'],
                                  'nj': "%.2f" % sco['nj']}
 
@@ -443,9 +433,8 @@ class Annexes(object):
             legende_recap_poste = r'''Récapitulatif postes pour compte ''' + intitule_compte
 
             dico_recap_poste = {'spu': "%.2f" % sco['somme_j_pu'], 'prj': "%.2f" % sco['prj'],
-                                'pj': "%.2f" % sco['pj'], 'spv': "%.2f" % sco['somme_j_pv'],
-                                'squ': "%.2f" % sco['somme_j_qu'], 'nrj': "%.2f" % sco['nrj'],
-                                'nj': "%.2f" % sco['nj'], 'sqv': "%.2f" % sco['somme_j_qv'],
+                                'pj': "%.2f" % sco['pj'], 'squ': "%.2f" % sco['somme_j_qu'],
+                                'nrj': "%.2f" % sco['nrj'], 'nj': "%.2f" % sco['nj'],
                                 'som': "%.2f" % sco['somme_j_om']}
 
             contenu_recap_poste = r'''
@@ -453,13 +442,9 @@ class Annexes(object):
                 Compte : ''' + intitule_compte + r''' & \multicolumn{1}{l|}{Montant} & \multicolumn{1}{l|}{Rabais}
                 & \multicolumn{1}{l|}{Total} \\
                 \hline
-                Montant utilisation Machine P & %(spu)s & \multirow{2}{*}{%(prj)s} & \multirow{2}{*}{%(pj)s} \\
-                \cline{1-2}
-                Montant réservation Machine P & %(spv)s &  & \\
+                Montant utilisation Machine P & %(spu)s & %(prj)s & %(pj)s \\
                 \hline
-                Montant utilisation Machine NP & %(squ)s & \multirow{3}{*}{%(nrj)s} & \multirow{3}{*}{%(nj)s} \\
-                \cline{1-2}
-                Montant réservation Machine NP & %(sqv)s &  &  \\
+                Montant utilisation Machine NP & %(squ)s & \multirow{2}{*}{%(nrj)s} & \multirow{2}{*}{%(nj)s} \\
                 \cline{1-2}
                 Montant Main d'oeuvre & %(som)s &  &  \\
                 \hline
@@ -475,6 +460,10 @@ class Annexes(object):
                     '''
 
             contenu_compte += Latex.tableau(contenu_recap_poste, structure_recap_poste, legende_recap_poste)
+
+            if nombre_res > 0:
+                contenu_compte += contenu_rsv
+
             contenu_compte += contenu_projet
             # ## compte
 
@@ -525,25 +514,25 @@ class Annexes(object):
         dico_recap_poste_cl = {'kpm1': '0.00', 'kprj1': '0.00', 'pk1': '0.00', 'kpm2': '0.00', 'kprj2': '0.00',
                                'pk2': '0.00', 'kpm3': '0.00', 'kprj3': '0.00', 'pk3': '0.00', 'kpm4': '0.00',
                                'kprj4': '0.00', 'pk4': '0.00',
-                               'tpm': "%.2f" % scl['somme_t_pm'], 'tprj': "%.2f" % scl['somme_t_prj'],
-                               'pt': "%.2f" % scl['pt'], 'tqm': "%.2f" % scl['somme_t_qm'],
+                               'tpm': "%.2f" % scl['somme_t_pu'], 'tprj': "%.2f" % scl['somme_t_prj'],
+                               'pt': "%.2f" % scl['pt'], 'tqm': "%.2f" % scl['somme_t_qu'],
                                'nt': "%.2f" % scl['nt'], 'tnrj': "%.2f" % scl['somme_t_nrj'],
                                'tom': "%.2f" % scl['somme_t_om']}
 
         if '1' in sca:
-            dico_recap_poste_cl['kpm1'] = "%.2f" % sca['1']['somme_k_pm']
+            dico_recap_poste_cl['kpm1'] = "%.2f" % sca['1']['somme_k_pu']
             dico_recap_poste_cl['kprj1'] = "%.2f" % sca['1']['somme_k_prj']
             dico_recap_poste_cl['pk1'] = "%.2f" % sca['1']['pk']
         if '2' in sca:
-            dico_recap_poste_cl['kpm2'] = "%.2f" % sca['2']['somme_k_pm']
+            dico_recap_poste_cl['kpm2'] = "%.2f" % sca['2']['somme_k_pu']
             dico_recap_poste_cl['kprj2'] = "%.2f" % sca['2']['somme_k_prj']
             dico_recap_poste_cl['pk2'] = "%.2f" % sca['2']['pk']
         if '3' in sca:
-            dico_recap_poste_cl['kpm3'] = "%.2f" % sca['3']['somme_k_pm']
+            dico_recap_poste_cl['kpm3'] = "%.2f" % sca['3']['somme_k_pu']
             dico_recap_poste_cl['kprj3'] = "%.2f" % sca['3']['somme_k_prj']
             dico_recap_poste_cl['pk3'] = "%.2f" % sca['3']['pk']
         if '4' in sca:
-            dico_recap_poste_cl['kpm4'] = "%.2f" % sca['4']['somme_k_pm']
+            dico_recap_poste_cl['kpm4'] = "%.2f" % sca['4']['somme_k_pu']
             dico_recap_poste_cl['kprj4'] = "%.2f" % sca['4']['somme_k_prj']
             dico_recap_poste_cl['pk4'] = "%.2f" % sca['4']['pk']
 
@@ -616,7 +605,6 @@ class Annexes(object):
 
         dico = {'date': date, 'heure': heure,
                 'machine': Latex.echappe_caracteres(cae['nom_machine']),
-                'projet': Latex.echappe_caracteres(cae['intitule_projet']),
                 'operateur': Latex.echappe_caracteres(cae['nom_op']),
                 'rem_op': Latex.echappe_caracteres(cae['remarque_op']),
                 'rem_staff': Latex.echappe_caracteres(cae['remarque_staff']),
@@ -673,17 +661,12 @@ class Annexes(object):
         return ligne, [(p1 + p4), (p2 + p5), (p3 + p6)]
 
     @staticmethod
-    def ligne_res(res, machine):
+    def ligne_res(res):
         """
         création d'une ligne de tableau pour une réservation
         :param res: réservation particulière
-        :param machine: machine concernée
         :return: ligne de tableau latex
         """
-        p7 = round(machine['t_h_reservation_hp_p'] * res['duree_fact_hp'] / 60, 2)
-        p8 = round(machine['t_h_reservation_hp_np'] * res['duree_fact_hp'] / 60, 2)
-        p9 = round(machine['t_h_reservation_hc_p'] * res['duree_fact_hc'] / 60, 2)
-        p10 = round(machine['t_h_reservation_hc_np'] * res['duree_fact_hc'] / 60, 2)
         login = Latex.echappe_caracteres(res['date_debut']).split()
         temps = login[0].split('-')
         date = temps[0]
@@ -696,15 +679,10 @@ class Annexes(object):
 
         dico = {'date': date, 'heure': heure,
                 'machine': Latex.echappe_caracteres(res['nom_machine']),
-                'projet': Latex.echappe_caracteres(res['intitule_projet']),
                 'reserve': Latex.echappe_caracteres(res['date_reservation']),
                 'supprime': Latex.echappe_caracteres(res['date_suppression']),
                 'shp': Outils.format_heure(res['duree_hp']), 'shc': Outils.format_heure(res['duree_hc']),
-                'fhp': Outils.format_heure(res['duree_fact_hp']), 'fhc': Outils.format_heure(res['duree_fact_hc']),
-                't7': "%d" % machine['t_h_reservation_hp_p'], 't8': "%d" % machine['t_h_reservation_hp_np'],
-                't9': "%d" % machine['t_h_reservation_hc_p'], 't10': "%d" % machine['t_h_reservation_hc_np'],
-                'p7': Outils.format_si_nul(p7), 'p8': Outils.format_si_nul(p8), 'p9': Outils.format_si_nul(p9),
-                'p10': Outils.format_si_nul(p10)}
+                'fhp': Outils.format_heure(res['duree_fact_hp']), 'fhc': Outils.format_heure(res['duree_fact_hc'])}
 
         nb = 0
         if res['duree_fact_hp'] > 0:
@@ -714,7 +692,7 @@ class Annexes(object):
             nb += 1
 
         if nb == 0:
-            return "", [0, 0]
+            return ""
 
         if res['date_suppression'] != "":
             nb += 1
@@ -727,7 +705,7 @@ class Annexes(object):
 
         nb = 0
         if res['duree_fact_hp'] > 0:
-            ligne += r''' & %(machine)s & HP & %(shp)s & %(fhp)s & %(t7)s & %(t8)s & %(p7)s & %(p8)s \\
+            ligne += r''' & %(machine)s & HP & %(shp)s & %(fhp)s\\
                 ''' % dico
             nb += 1
 
@@ -736,18 +714,18 @@ class Annexes(object):
                 ligne += r'''& &'''
             else:
                 ligne += r'''& %(machine)s ''' % dico
-            ligne += r''' & HC & %(shc)s & %(fhc)s & %(t9)s & %(t10)s & %(p9)s & %(p10)s \\
+            ligne += r''' & HC & %(shc)s & %(fhc)s \\
                 ''' % dico
 
         if res['date_suppression'] != "":
-            ligne += r'''\cline{3-10}
-                &  & \multicolumn{8}{l|}{Supprimé le : %(supprime)s} \\
+            ligne += r'''\cline{3-6}
+                &  & \multicolumn{4}{l|}{Supprimé le : %(supprime)s} \\
                 ''' % dico
 
         ligne += r'''\hline
             '''
 
-        return ligne, [(p7 + p9), (p8 + p10)]
+        return ligne
 
     @staticmethod
     def ligne_liv(livraison):
