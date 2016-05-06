@@ -202,10 +202,10 @@ class Sommes(object):
                                     machines_utilisees.append(key)
                     for mach_u in machines_utilisees:
                         if mach_u in somme_res:
-                            mini_hp = somme_res[mach_u]['res_hp'] + somme_res[mach_u]['ann_hp'] *\
-                                                                    machines.donnees[mach_u]['tx_occ_eff_hp']
-                            mini_hc = somme_res[mach_u]['res_hc'] + somme_res[mach_u]['ann_hc'] *\
-                                                                    machines.donnees[mach_u]['tx_occ_eff_hc']
+                            mini_hp = (somme_res[mach_u]['res_hp'] + somme_res[mach_u]['ann_hp']) * \
+                                                                    machines.donnees[mach_u]['tx_occ_eff_hp'] / 100
+                            mini_hc = (somme_res[mach_u]['res_hc'] + somme_res[mach_u]['ann_hc']) * \
+                                                                    machines.donnees[mach_u]['tx_occ_eff_hc'] / 100
                         else:
                             mini_hp = 0
                             mini_hc = 0
@@ -215,7 +215,7 @@ class Sommes(object):
                         else:
                             pen_hp = mini_hp
                             pen_hc = mini_hc
-                        somme['res'][mach_u] = {'pen_hp': round(pen_hp/60,1), 'pen_hc': round(pen_hc/60,1)}
+                        somme['res'][mach_u] = {'pen_hp': round(pen_hp/60, 1), 'pen_hc': round(pen_hc/60, 1)}
 
             self.sco = 1
             self.sommes_comptes = spc
@@ -332,14 +332,13 @@ class Sommes(object):
                         som_m['pen_hp'] += mach['pen_hp']
                         som_m['pen_hc'] += mach['pen_hc']
 
-                for id_mach, mach in somme['res'].items():
-                        som_m = somme['res'][id_mach]
-                        if som_m['pen_hp'] > 0:
-                            som_m['m_hp'] += mach['pen_hp'] * reservations.sommes[code_client][id_mach]['pu_hp']
-                            somme['rm'] += som_m['m_hp']
-                        if som_m['pen_hc'] > 0:
-                            som_m['m_hc'] += mach['pen_hc'] * reservations.sommes[code_client][id_mach]['pu_hc']
-                            somme['rm'] += som_m['m_hc']
+                for id_mach, som_m in somme['res'].items():
+                    if som_m['pen_hp'] > 0:
+                        som_m['m_hp'] += som_m['pen_hp'] * reservations.sommes[code_client][id_mach]['pu_hp']
+                        somme['rm'] += som_m['m_hp']
+                    if som_m['pen_hc'] > 0:
+                        som_m['m_hc'] += som_m['pen_hc'] * reservations.sommes[code_client][id_mach]['pu_hc']
+                        somme['rm'] += som_m['m_hc']
 
                 somme['rr'] = Rabais.rabais_reservation_petit_montant(somme['rm'], self.min_fact_rese)
                 somme['r'] = somme['rm'] - somme['rr']

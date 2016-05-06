@@ -1,4 +1,3 @@
-import csv
 from latex import Latex
 from outils import Outils
 

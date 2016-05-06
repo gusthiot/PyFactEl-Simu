@@ -227,14 +227,6 @@ class Annexes(object):
             res_proj = reservations.reservations_pour_compte(id_compte, code_client)
             for res in res_proj:
                 nombre_res += 1
-                # if res['id_machine'] not in machines_utilisees:
-                #     machines_utilisees[res['id_machine']] = {'machine': res['nom_machine'], 'usage_hp': 0,
-                #                                              'reservation_hp': 0, 'facture_hp': 0, 'usage_hc': 0,
-                #                                              'reservation_hc': 0, 'facture_hc': 0}
-                # machines_utilisees[res['id_machine']]['reservation_hp'] += res['duree_hp']
-                # machines_utilisees[res['id_machine']]['reservation_hc'] += res['duree_hc']
-                # machines_utilisees[res['id_machine']]['facture_hp'] += res['duree_fact_hp']
-                # machines_utilisees[res['id_machine']]['facture_hc'] += res['duree_fact_hc']
                 ligne = Annexes.ligne_res(res)
                 contenu_res += ligne
 
@@ -286,12 +278,6 @@ class Annexes(object):
                 resultats = [0, 0, 0]
                 for cae in cae_proj:
                     nombre_cae += 1
-                    # if cae['id_machine'] not in machines_utilisees:
-                    #     machines_utilisees[cae['id_machine']] = {'machine': cae['nom_machine'], 'usage_hp': 0,
-                    #                                              'reservation_hp': 0, 'facture_hp': 0, 'usage_hc': 0,
-                    #                                              'reservation_hc': 0, 'facture_hc': 0}
-                    # machines_utilisees[cae['id_machine']]['usage_hp'] += cae['duree_machine_hp']
-                    # machines_utilisees[cae['id_machine']]['usage_hc'] += cae['duree_machine_hc']
                     machine = machines.donnees[cae['id_machine']]
                     coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
                     ligne, resultat = Annexes.ligne_cae(cae, machine, coefmachine)
@@ -345,41 +331,7 @@ class Annexes(object):
                 if nombre_liv > 0:
                     contenu_projet += Latex.long_tableau(contenu_liv, structure_liv, legende_liv)
                 # ## liv
-                """
-                if nombre_cae > 0 or nombre_res > 0:
-                    structure_stat_machines = r'''{|l|l|l|l|l|}'''
-                    legende_stat_machines = r'''Statistiques de réservation/utilisation par machine : ''' + \
-                                            intitule_compte + r''' / ''' + intitule_projet
-                    contenu_stat_machines = r'''
-                        \hline
-                        Equipement & & Utilisation & Res. Slot & Res. Effect. \\
-                        \hline
-                        '''
 
-                    for machine_t in sorted(machines_utilisees.items(), key=lambda k_v: k_v[1]['machine']):
-                        machine = machine_t[1]
-                        dico_stat_machines = {
-                            'machine': Latex.echappe_caracteres(machine['machine']),
-                            'usage_hp': Outils.format_heure(machine['usage_hp']),
-                            'reservation_hp': Outils.format_heure(machine['reservation_hp']),
-                            'facture_hp': Outils.format_heure(machine['facture_hp']),
-                            'usage_hc': Outils.format_heure(machine['usage_hc']),
-                            'reservation_hc': Outils.format_heure(machine['reservation_hc']),
-                            'facture_hc': Outils.format_heure(machine['facture_hc'])}
-                        if machine['facture_hp'] > 0 or \
-                                machine['reservation_hp'] or machine['usage_hp']:
-                            contenu_stat_machines += r'''%(machine)s & HP &  %(usage_hp)s & %(reservation_hp)s & %(facture_hp)s \\
-                            \hline
-                            ''' % dico_stat_machines
-                        if machine['facture_hc'] > 0 or \
-                                machine['reservation_hc'] or machine['usage_hc']:
-                            contenu_stat_machines += r'''%(machine)s & HC & %(usage_hc)s & %(reservation_hc)s & %(facture_hc)s \\
-                            \hline
-                            ''' % dico_stat_machines
-
-                    contenu_projet += Latex.tableau(contenu_stat_machines, structure_stat_machines,
-                                                    legende_stat_machines)
-                """
                 # ## projet
 
             sco = sommes.sommes_comptes[code_client][id_compte]
@@ -463,6 +415,80 @@ class Annexes(object):
 
             if nombre_res > 0:
                 contenu_compte += contenu_rsv
+
+            machines_utilisees = {}
+            somme_res_compte = {}
+            if code_client in reservations.sommes:
+                if id_compte in reservations.sommes[code_client]:
+                    somme_res_compte = reservations.sommes[code_client][id_compte]
+                    for key in somme_res_compte.keys():
+                        machines_utilisees[key] = {'machine': machines.donnees[key]['nom']}
+            somme_cae_compte = {}
+            if code_client in acces.sommes:
+                if id_compte in acces.sommes[code_client]:
+                    somme_cae_compte = acces.sommes[code_client][id_compte]
+                    for key in somme_cae_compte.keys():
+                        if key not in machines_utilisees:
+                            machines_utilisees[key] = {'machine': machines.donnees[key]['nom']}
+
+            if len(machines_utilisees) > 0:
+                structure_stat_machines = r'''{|l|c|c|c|c|c|c|r|}'''
+                legende_stat_machines = r'''Statistiques de réservation/utilisation par machine : ''' + intitule_compte
+                contenu_stat_machines = r'''
+                    \hline
+                    Equipement & & Slot rés. & Slot ann. & Taux & Utilisation minimale & Machine & Pénalités [h] \\
+                    \hline
+                    '''
+
+                for machine_t in sorted(machines_utilisees.items(), key=lambda k_v: k_v[1]['machine']):
+                    machine = machine_t[1]
+                    id_machine = machine_t[0]
+
+                    taux_hp = machines.donnees[id_machine]['tx_occ_eff_hp']
+                    taux_hc = machines.donnees[id_machine]['tx_occ_eff_hc']
+                    duree_hp = 0
+                    duree_hc = 0
+                    res_hp = 0
+                    res_hc = 0
+                    ann_hp = 0
+                    ann_hc = 0
+                    if id_machine in somme_cae_compte:
+                        duree_hp = somme_cae_compte[id_machine]['duree_hp']
+                        duree_hc = somme_cae_compte[id_machine]['duree_hc']
+                    if id_machine in somme_res_compte:
+                        res_hp = somme_res_compte[id_machine]['res_hp']
+                        res_hc = somme_res_compte[id_machine]['res_hc']
+                        ann_hp = somme_res_compte[id_machine]['ann_hp']
+                        ann_hc = somme_res_compte[id_machine]['ann_hc']
+
+                    min_hp = (res_hp + ann_hp) * taux_hp / 100
+                    min_hc = (res_hc + ann_hc) * taux_hc / 100
+
+                    pen_hp = min_hp - duree_hp
+                    pen_hc = min_hc - duree_hc
+
+                    dico_stat_machines = {
+                        'machine': Latex.echappe_caracteres(machine['machine']),
+                        'res_hp': Outils.format_heure(res_hp), 'res_hc': Outils.format_heure(res_hc),
+                        'ann_hp': Outils.format_heure(ann_hp), 'ann_hc': Outils.format_heure(ann_hc),
+                        'duree_hp': Outils.format_heure(duree_hp), 'duree_hc': Outils.format_heure(duree_hc),
+                        'taux_hp': str(int(taux_hp)) + '\%', 'taux_hc': str(int(taux_hc)) + '\%',
+                        'min_hp': Outils.format_heure(min_hp), 'min_hc': Outils.format_heure(min_hc),
+                        'pen_hp': round(pen_hp/60, 1), 'pen_hc': round(pen_hc/60, 1)}
+
+                    if res_hp > 0 or ann_hp or duree_hp:
+                        contenu_stat_machines += r'''%(machine)s & HP &  %(res_hp)s & %(ann_hp)s & %(taux_hp)s &
+                            %(min_hp)s & %(duree_hp)s & %(pen_hp)s \\
+                            \hline
+                            ''' % dico_stat_machines
+                    if res_hc > 0 or ann_hc or duree_hc:
+                        contenu_stat_machines += r'''%(machine)s & HC &  %(res_hc)s & %(ann_hc)s & %(taux_hc)s &
+                            %(min_hc)s & %(duree_hc)s & %(pen_hc)s \\
+                            \hline
+                            ''' % dico_stat_machines
+
+                contenu_compte += Latex.tableau(contenu_stat_machines, structure_stat_machines,
+                                                legende_stat_machines)
 
             contenu_compte += contenu_projet
             # ## compte
@@ -566,6 +592,53 @@ class Annexes(object):
                 '''
 
         contenu += Latex.tableau(contenu_recap_poste_cl, structure_recap_poste_cl, legende_recap_poste_cl)
+
+        if scl['r'] > 0:
+            structure_frais_client = r'''{|l|c|r|r|r|}'''
+            legende_frais_client = r'''Frais de réservation/utilisation par machine pour client : ''' + intitule_client
+            contenu_frais_client = r'''
+                    \hline
+                    Equipement & & Pénalités [h] & PU & Montant \\
+                    \hline
+                    '''
+            machines_utilisees = {}
+            for key in scl['res']:
+                machines_utilisees[key] = {'machine': machines.donnees[key]['nom']}
+
+            for machine_t in sorted(machines_utilisees.items(), key=lambda k_v: k_v[1]['machine']):
+                machine = machine_t[1]
+                id_machine = machine_t[0]
+                som_m = scl['res'][id_machine]
+                if som_m['pen_hp'] > 0 or som_m['pen_hc'] > 0:
+
+                    dico_frais_client = {
+                        'machine': Latex.echappe_caracteres(machine['machine']),
+                        'pen_hp': som_m['pen_hp'], 'pen_hc': som_m['pen_hc'],
+                        'mont_hp': Outils.format_si_nul(som_m['m_hp']), 'mont_hc': Outils.format_si_nul(som_m['m_hc']),
+                        'pu_hp': Outils.format_si_nul(reservations.sommes[code_client][id_machine]['pu_hp']),
+                        'pu_hc': Outils.format_si_nul(reservations.sommes[code_client][id_machine]['pu_hc'])}
+
+                    if som_m['pen_hp'] > 0:
+                        contenu_frais_client += r'''%(machine)s & HP &  %(pen_hp)s & %(pu_hp)s & %(mont_hp)s \\
+                            \hline
+                            ''' % dico_frais_client
+
+                    if som_m['pen_hc'] > 0:
+                        contenu_frais_client += r'''%(machine)s & HC &  %(pen_hc)s & %(pu_hc)s & %(mont_hc)s \\
+                            \hline
+                            ''' % dico_frais_client
+
+            contenu_frais_client += r'''
+                \multicolumn{4}{|r|}{Total} & ''' + Outils.format_si_nul(scl['r']) + r'''\\
+                \hline
+                '''
+
+            contenu += Latex.tableau(contenu_frais_client, structure_frais_client, legende_frais_client)
+
+
+
+
+
         contenu += contenu_compte
 
         return contenu
