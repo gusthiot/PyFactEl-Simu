@@ -198,10 +198,10 @@ class Facture(object):
                                                                          edition)
                                 poste += 1
                         inc += 1
-    
+                net_amount = client['somme_t'] + client['em'] - client['er'] + client['r']
                 contenu_client += r'''
                     <tr><td colspan="8" id="toright">Net amount [CHF] : </td><td id="toright">
-                    ''' + "%.2f" % (client['somme_t'] + client['em'] - client['er']) + r'''</td></tr>
+                    ''' + "%.2f" % (net_amount) + r'''</td></tr>
                     </table>
                     '''
                 contenu_client += r'''<a href="''' + dossier_annexe + r'''" target="new">''' + nom_annexe + r'''
