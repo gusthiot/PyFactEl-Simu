@@ -474,7 +474,7 @@ class Annexes(object):
                         'duree_hp': Outils.format_heure(duree_hp), 'duree_hc': Outils.format_heure(duree_hc),
                         'taux_hp': str(int(taux_hp)) + '\%', 'taux_hc': str(int(taux_hc)) + '\%',
                         'min_hp': Outils.format_heure(min_hp), 'min_hc': Outils.format_heure(min_hc),
-                        'pen_hp': round(pen_hp/60, 1), 'pen_hc': round(pen_hc/60, 1)}
+                        'pen_hp': "%.1f" % round(pen_hp/60, 1), 'pen_hc': "%.1f" % round(pen_hc/60, 1)}
 
                     if res_hp > 0 or ann_hp or duree_hp:
                         contenu_stat_machines += r'''%(machine)s & HP &  %(res_hp)s & %(ann_hp)s & %(taux_hp)s &
@@ -613,7 +613,7 @@ class Annexes(object):
 
                     dico_frais_client = {
                         'machine': Latex.echappe_caracteres(machine['machine']),
-                        'pen_hp': som_m['pen_hp'], 'pen_hc': som_m['pen_hc'],
+                        'pen_hp': "%.1f" % som_m['pen_hp'], 'pen_hc': "%.1f" % som_m['pen_hc'],
                         'mont_hp': Outils.format_si_nul(som_m['m_hp']), 'mont_hc': Outils.format_si_nul(som_m['m_hc']),
                         'pu_hp': Outils.format_si_nul(reservations.sommes[code_client][id_machine]['pu_hp']),
                         'pu_hc': Outils.format_si_nul(reservations.sommes[code_client][id_machine]['pu_hc'])}
