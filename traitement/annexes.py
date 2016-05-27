@@ -503,18 +503,18 @@ class Annexes(object):
         contenu += entete
 
         dic_emo = {'emb':  "%.2f" % client['emol_base_mens'], 'ef':  "%.2f" % client['emol_fixe'],
-                   'pente': client['coef'], 'tot_eq_p': "%.2f" % scl['pt'], 'tot_eq_np': "%.2f" % scl['qt'],
-                   'tot_eq': "%.2f" % scl['somme_eq'], 'rabais': "%.2f" % scl['er']}
+                   'pente': client['coef'], 'tot_eq_r': "%.2f" % scl['r'], 'tot_eq_p': "%.2f" % scl['pt'],
+                   'tot_eq_np': "%.2f" % scl['qt'], 'tot_eq': "%.2f" % scl['somme_eq'], 'rabais': "%.2f" % scl['er']}
 
-        structure_emolument = r'''{|r|r|l|r|r|r|r|}'''
+        structure_emolument = r'''{|r|r|l|r|r|r|r|r|}'''
         legende_emolument = r'''Emolument pour client ''' + intitule_client
         contenu_emolument = r'''
             \hline
             \multicolumn{1}{|l|}{Emolument de base} & \multicolumn{1}{l|}{Emolument fixe} & Pente
-            & \multicolumn{1}{l|}{Total EQ P} & \multicolumn{1}{l|}{Total EQ NP} & \multicolumn{1}{l|}{Total EQ}
-            & \multicolumn{1}{l|}{Rabais émolument} \\
+            & \multicolumn{1}{l|}{Total EQ R} & \multicolumn{1}{l|}{Total EQ P} & \multicolumn{1}{l|}{Total EQ NP} &
+            \multicolumn{1}{l|}{Total EQ} & \multicolumn{1}{l|}{Rabais émolument} \\
             \hline
-            %(emb)s & %(ef)s & %(pente)s & %(tot_eq_p)s & %(tot_eq_np)s & %(tot_eq)s & %(rabais)s \\
+            %(emb)s & %(ef)s & %(pente)s & %(tot_eq_r)s & %(tot_eq_p)s & %(tot_eq_np)s & %(tot_eq)s & %(rabais)s \\
             \hline
             ''' % dic_emo
 

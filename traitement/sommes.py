@@ -16,7 +16,7 @@ class Sommes(object):
                             'somme_k_orj', 'ok', 'somme_k_nm', 'somme_k_nrj', 'nk']
 
     cles_somme_client = ['somme_t_pu', 'somme_t_prj', 'pt', 'somme_t_qu', 'somme_t_qrj', 'qt', 'somme_t_om',
-                         'somme_t_orj', 'ot', 'somme_t_nm', 'somme_t_nrj', 'nt', 'somme_eq', 'somme_sb', 'somme_t',
+                         'somme_t_orj', 'ot', 'somme_t_nm', 'somme_t_nrj', 'nt', 'somme_eq', 'somme_t',
                          'em', 'er0', 'er', 'e', 'res', 'rm', 'rr', 'r']
 
     def __init__(self, verification, generaux):
@@ -313,13 +313,6 @@ class Sommes(object):
                         somme['sommes_cat_r'][categorie] += som_cat['sommes_cat_r'][categorie]
                         somme['tot_cat'][categorie] += som_cat['tot_cat'][categorie]
 
-                cl = clients.donnees[code_client]
-
-                somme['somme_eq'], somme['somme_sb'], somme['somme_t'], somme['em'], somme['er0'], somme['er'] = \
-                    Rabais.rabais_emolument(somme['pt'], somme['qt'], somme['ot'], somme['tot_cat'],
-                                            cl['emol_base_mens'], cl['emol_fixe'], cl['coef'], cl['emol_sans_activite'])
-                somme['e'] = somme['em'] - somme['er']
-
                 som_cli = self.sommes_comptes[code_client]
                 somme['res'] = {}
                 somme['rm'] = 0
@@ -342,6 +335,14 @@ class Sommes(object):
 
                 somme['rr'] = Rabais.rabais_reservation_petit_montant(somme['rm'], self.min_fact_rese)
                 somme['r'] = somme['rm'] - somme['rr']
+
+                cl = clients.donnees[code_client]
+
+                somme['somme_eq'], somme['somme_t'], somme['em'], somme['er0'], somme['er'] = \
+                    Rabais.rabais_emolument(somme['pt'], somme['qt'], somme['ot'], somme['tot_cat'],
+                                            cl['emol_base_mens'], cl['emol_fixe'], cl['coef'],
+                                            cl['emol_sans_activite'], somme['r'])
+                somme['e'] = somme['em'] - somme['er']
 
             self.calculees = 1
             self.sommes_clients = spc

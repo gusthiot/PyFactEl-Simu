@@ -24,7 +24,7 @@ class Rabais(object):
             return fhp, fhc
 
     @staticmethod
-    def rabais_emolument(pt, qt, ot, cat_t, emb, fix, coef_a, regle):
+    def rabais_emolument(pt, qt, ot, cat_t, emb, fix, coef_a, regle, res):
         """
         calcule le rabais sur émolument
         :param pt: pt
@@ -35,9 +35,10 @@ class Rabais(object):
         :param fix: émolument fixe
         :param coef_a: coefficient a
         :param regle: émolument sans activité
+        :param res: frais de réservation
         :return: somme EQ, somme SB, somme T, em, er0, er
         """
-        somme_eq = pt + qt
+        somme_eq = pt + qt + res
         somme_sb = pt + qt + ot
         somme_t = pt + qt + ot
         for cat, tt in cat_t.items():
@@ -49,7 +50,7 @@ class Rabais(object):
             er = em
         else:
             er = er0
-        return somme_eq, somme_sb, somme_t, em, er0, er
+        return somme_eq, somme_t, em, er0, er
 
     @staticmethod
     def rabais_plafonnement(somme_j_pu, s, k):
