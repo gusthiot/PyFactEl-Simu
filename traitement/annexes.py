@@ -502,6 +502,43 @@ class Annexes(object):
 
         contenu += entete
 
+        structure_recap_poste_cl = r'''{|l|r|r|r|}'''
+        legende_recap_poste_cl = r'''Récapitulatif postes pour client ''' + intitule_client
+
+        dico_recap_poste_cl = {'emom': "%.2f" % scl['em'], 'emor': "%.2f" % scl['er'], 'emo': "%.2f" % scl['e'],
+                               'resm': "%.2f" % scl['rm'], 'resr': "%.2f" % scl['rr'], 'res': "%.2f" % scl['r'],
+                               'tpm': "%.2f" % scl['somme_t_pu'], 'tprj': "%.2f" % scl['somme_t_prj'],
+                               'pt': "%.2f" % scl['pt'], 'tqm': "%.2f" % scl['somme_t_qu'],
+                               'nt': "%.2f" % scl['nt'], 'tnrj': "%.2f" % scl['somme_t_nrj'],
+                               'tom': "%.2f" % scl['somme_t_om']}
+
+        contenu_recap_poste_cl = r'''
+            \hline
+             & \multicolumn{1}{l|}{Montant} & \multicolumn{1}{l|}{Rabais} & \multicolumn{1}{l|}{Total} \\
+            \hline
+            Emolument & %(emom)s & %(emor)s & %(emo)s \\
+            \hline
+            Frias de réservation & %(resm)s & %(resr)s & %(res)s \\
+            \hline
+            Machine NP & %(tqm)s & \multirow{2}{*}{%(tnrj)s} & \multirow{2}{*}{%(nt)s} \\
+            \cline{1-2}
+            Main d'oeuvre & %(tom)s & & \\
+            \hline
+            Machine P & %(tpm)s & %(tprj)s & %(pt)s \\
+            \hline
+            ''' % dico_recap_poste_cl
+
+        for categorie in generaux.codes_d3():
+            contenu_recap_poste_cl += Latex.echappe_caracteres(coefprests.obtenir_noms_categories(categorie))
+            contenu_recap_poste_cl += r''' & '''
+            contenu_recap_poste_cl += "%.2f" % scl['sommes_cat_m'][categorie] + r''' & '''
+            contenu_recap_poste_cl += "%.2f" % scl['sommes_cat_r'][categorie] + r''' & '''
+            contenu_recap_poste_cl += "%.2f" % scl['tot_cat'][categorie] + r''' \\
+                \hline
+                '''
+
+        contenu += Latex.tableau(contenu_recap_poste_cl, structure_recap_poste_cl, legende_recap_poste_cl)
+
         dic_emo = {'emb':  "%.2f" % client['emol_base_mens'], 'ef':  "%.2f" % client['emol_fixe'],
                    'pente': client['coef'], 'tot_eq_r': "%.2f" % scl['r'], 'tot_eq_p': "%.2f" % scl['pt'],
                    'tot_eq_np': "%.2f" % scl['qt'], 'tot_eq': "%.2f" % scl['somme_eq'], 'rabais': "%.2f" % scl['er']}
@@ -519,79 +556,6 @@ class Annexes(object):
             ''' % dic_emo
 
         contenu += Latex.tableau(contenu_emolument, structure_emolument, legende_emolument)
-
-        dico_recap_compte = {'plafond': "%.2f" % scl['pt'], 'non_plafond': "%.2f" % scl['nt'],
-                             'total': "%.2f" % scl['somme_t']}
-
-        contenu_recap_compte += r'''Total article & & %(plafond)s & %(non_plafond)s''' % dico_recap_compte
-
-        for categorie in generaux.codes_d3():
-            contenu_recap_compte += r''' & ''' + "%.2f" % scl['tot_cat'][categorie]
-
-        contenu_recap_compte += r'''& %(total)s \\
-                \hline
-                ''' % dico_recap_compte
-
-        contenu += Latex.tableau(contenu_recap_compte, structure_recap_compte, legende_recap_compte)
-
-        structure_recap_poste_cl = r'''{|l|r|r|r|}'''
-        legende_recap_poste_cl = r'''Récapitulatif postes pour client ''' + intitule_client
-
-        dico_recap_poste_cl = {'kpm1': '0.00', 'kprj1': '0.00', 'pk1': '0.00', 'kpm2': '0.00', 'kprj2': '0.00',
-                               'pk2': '0.00', 'kpm3': '0.00', 'kprj3': '0.00', 'pk3': '0.00', 'kpm4': '0.00',
-                               'kprj4': '0.00', 'pk4': '0.00',
-                               'tpm': "%.2f" % scl['somme_t_pu'], 'tprj': "%.2f" % scl['somme_t_prj'],
-                               'pt': "%.2f" % scl['pt'], 'tqm': "%.2f" % scl['somme_t_qu'],
-                               'nt': "%.2f" % scl['nt'], 'tnrj': "%.2f" % scl['somme_t_nrj'],
-                               'tom': "%.2f" % scl['somme_t_om']}
-
-        if '1' in sca:
-            dico_recap_poste_cl['kpm1'] = "%.2f" % sca['1']['somme_k_pu']
-            dico_recap_poste_cl['kprj1'] = "%.2f" % sca['1']['somme_k_prj']
-            dico_recap_poste_cl['pk1'] = "%.2f" % sca['1']['pk']
-        if '2' in sca:
-            dico_recap_poste_cl['kpm2'] = "%.2f" % sca['2']['somme_k_pu']
-            dico_recap_poste_cl['kprj2'] = "%.2f" % sca['2']['somme_k_prj']
-            dico_recap_poste_cl['pk2'] = "%.2f" % sca['2']['pk']
-        if '3' in sca:
-            dico_recap_poste_cl['kpm3'] = "%.2f" % sca['3']['somme_k_pu']
-            dico_recap_poste_cl['kprj3'] = "%.2f" % sca['3']['somme_k_prj']
-            dico_recap_poste_cl['pk3'] = "%.2f" % sca['3']['pk']
-        if '4' in sca:
-            dico_recap_poste_cl['kpm4'] = "%.2f" % sca['4']['somme_k_pu']
-            dico_recap_poste_cl['kprj4'] = "%.2f" % sca['4']['somme_k_prj']
-            dico_recap_poste_cl['pk4'] = "%.2f" % sca['4']['pk']
-
-        contenu_recap_poste_cl = r'''
-            \hline
-             & \multicolumn{1}{l|}{Montant} & \multicolumn{1}{l|}{Rabais} & \multicolumn{1}{l|}{Total} \\
-            \hline
-            Machine P (catégorie 1 : Utilisateur) & %(kpm1)s & %(kprj1)s & %(pk1)s \\
-            \hline
-            Machine P (catégorie 2 : Etudiant en projet Master) & %(kpm2)s & %(kprj2)s & %(pk2)s \\
-            \hline
-            Machine P (catégorie 3 : Etudiant en projet Semestre) & %(kpm3)s & %(kprj3)s & %(pk3)s \\
-            \hline
-            Machine P (catégorie 4 : Client) & %(kpm4)s & %(kprj4)s & %(pk4)s \\
-            \hline
-            Machine P (total des catégories) & %(tpm)s & %(tprj)s & %(pt)s \\
-            \hline
-            Machine NP & %(tqm)s & \multirow{2}{*}{%(tnrj)s} & \multirow{2}{*}{%(nt)s} \\
-            \cline{1-2}
-            Main d'oeuvre & %(tom)s & & \\
-            \hline
-            ''' % dico_recap_poste_cl
-
-        for categorie in generaux.codes_d3():
-            contenu_recap_poste_cl += Latex.echappe_caracteres(coefprests.obtenir_noms_categories(categorie))
-            contenu_recap_poste_cl += r''' & '''
-            contenu_recap_poste_cl += "%.2f" % scl['sommes_cat_m'][categorie] + r''' & '''
-            contenu_recap_poste_cl += "%.2f" % scl['sommes_cat_r'][categorie] + r''' & '''
-            contenu_recap_poste_cl += "%.2f" % scl['tot_cat'][categorie] + r''' \\
-                \hline
-                '''
-
-        contenu += Latex.tableau(contenu_recap_poste_cl, structure_recap_poste_cl, legende_recap_poste_cl)
 
         if scl['r'] > 0:
             structure_frais_client = r'''{|l|c|r|r|r|}'''
@@ -635,9 +599,63 @@ class Annexes(object):
 
             contenu += Latex.tableau(contenu_frais_client, structure_frais_client, legende_frais_client)
 
+        dico_recap_compte = {'plafond': "%.2f" % scl['pt'], 'non_plafond': "%.2f" % scl['nt'],
+                             'total': "%.2f" % scl['somme_t']}
 
+        contenu_recap_compte += r'''Total article & & %(plafond)s & %(non_plafond)s''' % dico_recap_compte
 
+        for categorie in generaux.codes_d3():
+            contenu_recap_compte += r''' & ''' + "%.2f" % scl['tot_cat'][categorie]
 
+        contenu_recap_compte += r'''& %(total)s \\
+                \hline
+                ''' % dico_recap_compte
+
+        contenu += Latex.tableau(contenu_recap_compte, structure_recap_compte, legende_recap_compte)
+
+        structure_recap_cat_cl = r'''{|l|r|r|r|}'''
+        legende_recap_cat_cl = r'''Détail par catégorie pour client ''' + intitule_client
+
+        dico_recap_cat_cl = {'kpm1': '0.00', 'kprj1': '0.00', 'pk1': '0.00', 'kpm2': '0.00', 'kprj2': '0.00',
+                               'pk2': '0.00', 'kpm3': '0.00', 'kprj3': '0.00', 'pk3': '0.00', 'kpm4': '0.00',
+                               'kprj4': '0.00', 'pk4': '0.00',
+                               'tpm': "%.2f" % scl['somme_t_pu'], 'tprj': "%.2f" % scl['somme_t_prj'],
+                               'pt': "%.2f" % scl['pt']}
+
+        if '1' in sca:
+            dico_recap_cat_cl['kpm1'] = "%.2f" % sca['1']['somme_k_pu']
+            dico_recap_cat_cl['kprj1'] = "%.2f" % sca['1']['somme_k_prj']
+            dico_recap_cat_cl['pk1'] = "%.2f" % sca['1']['pk']
+        if '2' in sca:
+            dico_recap_cat_cl['kpm2'] = "%.2f" % sca['2']['somme_k_pu']
+            dico_recap_cat_cl['kprj2'] = "%.2f" % sca['2']['somme_k_prj']
+            dico_recap_cat_cl['pk2'] = "%.2f" % sca['2']['pk']
+        if '3' in sca:
+            dico_recap_cat_cl['kpm3'] = "%.2f" % sca['3']['somme_k_pu']
+            dico_recap_cat_cl['kprj3'] = "%.2f" % sca['3']['somme_k_prj']
+            dico_recap_cat_cl['pk3'] = "%.2f" % sca['3']['pk']
+        if '4' in sca:
+            dico_recap_cat_cl['kpm4'] = "%.2f" % sca['4']['somme_k_pu']
+            dico_recap_cat_cl['kprj4'] = "%.2f" % sca['4']['somme_k_prj']
+            dico_recap_cat_cl['pk4'] = "%.2f" % sca['4']['pk']
+
+        contenu_recap_cat_cl = r'''
+            \hline
+             & \multicolumn{1}{l|}{Montant} & \multicolumn{1}{l|}{Rabais} & \multicolumn{1}{l|}{Total} \\
+            \hline
+            Machine P (total des catégories) & %(tpm)s & %(tprj)s & %(pt)s \\
+            \hline
+            Machine P (catégorie 1 : Utilisateur) & %(kpm1)s & %(kprj1)s & %(pk1)s \\
+            \hline
+            Machine P (catégorie 2 : Etudiant en projet Master) & %(kpm2)s & %(kprj2)s & %(pk2)s \\
+            \hline
+            Machine P (catégorie 3 : Etudiant en projet Semestre) & %(kpm3)s & %(kprj3)s & %(pk3)s \\
+            \hline
+            Machine P (catégorie 4 : Client) & %(kpm4)s & %(kprj4)s & %(pk4)s \\
+            \hline
+            ''' % dico_recap_cat_cl
+
+        contenu += Latex.tableau(contenu_recap_cat_cl, structure_recap_cat_cl, legende_recap_cat_cl)
 
         contenu += contenu_compte
 
