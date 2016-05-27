@@ -90,21 +90,20 @@ class Sommes(object):
         spp = {}
         for acce in acces.donnees:
             id_compte = acce['id_compte']
-            co = comptes.donnees[id_compte]
-            code_client = co['code_client']
+            code_client = comptes.donnees[id_compte]['code_client']
             if code_client not in spp:
                 spp[code_client] = {}
-            client = spp[code_client]
-            if id_compte not in client:
-                client[id_compte] = {}
+            spp_cl = spp[code_client]
+            if id_compte not in spp_cl:
+                spp_cl[id_compte] = {}
             num_projet = acce['num_projet']
-            compte = client[id_compte]
-            if num_projet not in compte:
-                compte[num_projet] = self.nouveau_somme(Sommes.cles_somme_projet)
-                projet = compte[num_projet]
+            spp_co = spp_cl[id_compte]
+            if num_projet not in spp_co:
+                spp_co[num_projet] = self.nouveau_somme(Sommes.cles_somme_projet)
+                projet = spp_co[num_projet]
                 projet['intitule'] = acce['intitule_projet']
             else:
-                projet = compte[num_projet]
+                projet = spp_co[num_projet]
             projet['somme_p_pu'] += acce['pu']
             projet['somme_p_qu'] += acce['qu']
             projet['somme_p_om'] += acce['om']
@@ -113,21 +112,20 @@ class Sommes(object):
 
         for livraison in livraisons.donnees:
             id_compte = livraison['id_compte']
-            co = comptes.donnees[id_compte]
-            code_client = co['code_client']
+            code_client = comptes.donnees[id_compte]['code_client']
             if code_client not in spp:
                 spp[code_client] = {}
-            client = spp[code_client]
-            if id_compte not in client:
-                client[id_compte] = {}
+            spp_cl = spp[code_client]
+            if id_compte not in spp_cl:
+                spp_cl[id_compte] = {}
             num_projet = livraison['num_projet']
-            compte = client[id_compte]
-            if num_projet not in compte:
-                compte[num_projet] = self.nouveau_somme(Sommes.cles_somme_projet)
-                projet = compte[num_projet]
+            spp_co = spp_cl[id_compte]
+            if num_projet not in spp_co:
+                spp_co[num_projet] = self.nouveau_somme(Sommes.cles_somme_projet)
+                projet = spp_co[num_projet]
                 projet['intitule'] = livraison['intitule_projet']
             else:
-                projet = compte[num_projet]
+                projet = spp_co[num_projet]
 
             id_prestation = livraison['id_prestation']
             prestation = prestations.donnees[id_prestation]
@@ -149,16 +147,16 @@ class Sommes(object):
         """
 
         if self.sp != 0:
-            spc = {}
-            for code_client, client in self.sommes_projets.items():
-                if code_client not in spc:
-                    spc[code_client] = {}
-                cl = spc[code_client]
-                for id_compte, compte in client.items():
-                    cc = comptes.donnees[id_compte]
-                    cl[id_compte] = self.nouveau_somme(Sommes.cles_somme_compte)
-                    somme = cl[id_compte]
-                    for num_projet, projet in compte.items():
+            spco = {}
+            for code_client, spp_cl in self.sommes_projets.items():
+                if code_client not in spco:
+                    spco[code_client] = {}
+                spco_cl = spco[code_client]
+                for id_compte, spp_co in spp_cl.items():
+                    compte = comptes.donnees[id_compte]
+                    spco_cl[id_compte] = self.nouveau_somme(Sommes.cles_somme_compte)
+                    somme = spco_cl[id_compte]
+                    for num_projet, projet in spp_co.items():
                         somme['somme_j_pu'] += projet['somme_p_pu']
                         somme['somme_j_qu'] += projet['somme_p_qu']
                         somme['somme_j_om'] += projet['somme_p_om']
@@ -169,8 +167,8 @@ class Sommes(object):
                             somme['sommes_cat_r'][categorie] += projet['sommes_cat_r'][categorie]
                             somme['tot_cat'][categorie] += projet['tot_cat'][categorie]
 
-                    somme['prj'], somme['qrj'], somme['orj'] = Rabais.rabais_plafonnement(somme['somme_j_pu'],
-                                                                                          cc['seuil'], cc['pourcent'])
+                    somme['prj'], somme['qrj'], somme['orj'] = \
+                        Rabais.rabais_plafonnement(somme['somme_j_pu'],compte['seuil'], compte['pourcent'])
 
                     somme['pj'] = somme['somme_j_pu'] - somme['prj']
                     somme['qj'] = somme['somme_j_qu'] - somme['qrj']
@@ -218,7 +216,7 @@ class Sommes(object):
                         somme['res'][mach_u] = {'pen_hp': round(pen_hp/60, 1), 'pen_hc': round(pen_hc/60, 1)}
 
             self.sco = 1
-            self.sommes_comptes = spc
+            self.sommes_comptes = spco
 
         else:
             info = "Vous devez d'abord faire la somme par projet, avant la somme par compte"
@@ -238,38 +236,37 @@ class Sommes(object):
             return
 
         if self.sco != 0:
-            spc = {}
-            for code_client, client in self.sommes_comptes.items():
-                if code_client not in spc:
-                    spc[code_client] = {}
-                cl = spc[code_client]
-                for id_compte, compte in client.items():
-                    co = comptes.donnees[id_compte]
-                    cat = co['categorie']
-                    if cat not in cl:
-                        cl[cat] = self.nouveau_somme(Sommes.cles_somme_categorie)
-                    somme = cl[cat]
+            spca = {}
+            for code_client, spco_cl in self.sommes_comptes.items():
+                if code_client not in spca:
+                    spca[code_client] = {}
+                spca_cl = spca[code_client]
+                for id_compte, spco_co in spco_cl.items():
+                    cat = comptes.donnees[id_compte]['categorie']
+                    if cat not in spca_cl:
+                        spca_cl[cat] = self.nouveau_somme(Sommes.cles_somme_categorie)
+                    somme = spca_cl[cat]
 
-                    somme['somme_k_pu'] += compte['somme_j_pu']
-                    somme['somme_k_prj'] += compte['prj']
-                    somme['pk'] += compte['pj']
-                    somme['somme_k_qu'] += compte['somme_j_qu']
-                    somme['somme_k_qrj'] += compte['qrj']
-                    somme['qk'] += compte['qj']
-                    somme['somme_k_om'] += compte['somme_j_om']
-                    somme['somme_k_orj'] += compte['orj']
-                    somme['ok'] += compte['oj']
-                    somme['somme_k_nm'] += compte['somme_j_nm']
-                    somme['somme_k_nrj'] += compte['nrj']
-                    somme['nk'] += compte['nj']
+                    somme['somme_k_pu'] += spco_co['somme_j_pu']
+                    somme['somme_k_prj'] += spco_co['prj']
+                    somme['pk'] += spco_co['pj']
+                    somme['somme_k_qu'] += spco_co['somme_j_qu']
+                    somme['somme_k_qrj'] += spco_co['qrj']
+                    somme['qk'] += spco_co['qj']
+                    somme['somme_k_om'] += spco_co['somme_j_om']
+                    somme['somme_k_orj'] += spco_co['orj']
+                    somme['ok'] += spco_co['oj']
+                    somme['somme_k_nm'] += spco_co['somme_j_nm']
+                    somme['somme_k_nrj'] += spco_co['nrj']
+                    somme['nk'] += spco_co['nj']
 
                     for categorie in self.categories:
-                        somme['sommes_cat_m'][categorie] += compte['sommes_cat_m'][categorie]
-                        somme['sommes_cat_r'][categorie] += compte['sommes_cat_r'][categorie]
-                        somme['tot_cat'][categorie] += compte['tot_cat'][categorie]
+                        somme['sommes_cat_m'][categorie] += spco_co['sommes_cat_m'][categorie]
+                        somme['sommes_cat_r'][categorie] += spco_co['sommes_cat_r'][categorie]
+                        somme['tot_cat'][categorie] += spco_co['tot_cat'][categorie]
 
             self.sca = 1
-            self.sommes_categories = spc
+            self.sommes_categories = spca
 
         else:
             info = "Vous devez d'abord faire la somme par compte, avant la somme par catégorie"
@@ -290,11 +287,11 @@ class Sommes(object):
             return
 
         if self.sca != 0:
-            spc = {}
-            for code_client, client in self.sommes_categories.items():
-                spc[code_client] = self.nouveau_somme(Sommes.cles_somme_client)
-                somme = spc[code_client]
-                for cat, som_cat in client.items():
+            spcl = {}
+            for code_client, spca_cl in self.sommes_categories.items():
+                spcl[code_client] = self.nouveau_somme(Sommes.cles_somme_client)
+                somme = spcl[code_client]
+                for cat, som_cat in spca_cl.items():
                     somme['somme_t_pu'] += som_cat['somme_k_pu']
                     somme['somme_t_prj'] += som_cat['somme_k_prj']
                     somme['pt'] += som_cat['pk']
@@ -313,12 +310,11 @@ class Sommes(object):
                         somme['sommes_cat_r'][categorie] += som_cat['sommes_cat_r'][categorie]
                         somme['tot_cat'][categorie] += som_cat['tot_cat'][categorie]
 
-                som_cli = self.sommes_comptes[code_client]
+                spco_cl = self.sommes_comptes[code_client]
                 somme['res'] = {}
                 somme['rm'] = 0
-                for id_co, co in som_cli.items():
-                    co_res = co['res']
-                    for id_mach, mach in co_res.items():
+                for id_co, spco_co in spco_cl.items():
+                    for id_mach, mach in spco_co['res'].items():
                         if id_mach not in somme['res']:
                             somme['res'][id_mach] = {'pen_hp': 0, 'pen_hc': 0, 'm_hp': 0, 'm_hc': 0}
                         som_m = somme['res'][id_mach]
@@ -336,16 +332,16 @@ class Sommes(object):
                 somme['rr'] = Rabais.rabais_reservation_petit_montant(somme['rm'], self.min_fact_rese)
                 somme['r'] = somme['rm'] - somme['rr']
 
-                cl = clients.donnees[code_client]
+                client = clients.donnees[code_client]
 
                 somme['somme_eq'], somme['somme_t'], somme['em'], somme['er0'], somme['er'] = \
                     Rabais.rabais_emolument(somme['pt'], somme['qt'], somme['ot'], somme['tot_cat'],
-                                            cl['emol_base_mens'], cl['emol_fixe'], cl['coef'],
-                                            cl['emol_sans_activite'], somme['r'])
+                                            client['emol_base_mens'], client['emol_fixe'], client['coef'],
+                                            client['emol_sans_activite'], somme['r'])
                 somme['e'] = somme['em'] - somme['er']
 
             self.calculees = 1
-            self.sommes_clients = spc
+            self.sommes_clients = spcl
 
         else:
             info = "Vous devez d'abord faire la somme par catégorie, avant la somme par client"

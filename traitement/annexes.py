@@ -164,7 +164,7 @@ class Annexes(object):
         structure_recap_compte = r'''{|l|l|r|r|r|'''
         contenu_recap_compte = r'''
             \hline
-            Compte & Catégorie & \multicolumn{1}{l|}{Plafonné} & \multicolumn{1}{l|}{Non Plaf.}'''
+            Compte & Catégorie & \multicolumn{1}{l|}{Non Plaf.} & \multicolumn{1}{l|}{Plafonné}'''
 
         for categorie in generaux.codes_d3():
             structure_recap_compte += r'''r|'''
@@ -196,7 +196,7 @@ class Annexes(object):
             structure_recap_projet = r'''{|l|r|r|r|'''
             contenu_recap_projet = r'''
                 \hline
-                Projet & \multicolumn{1}{l|}{Plafonné} & \multicolumn{1}{l|}{Non Plaf.} '''
+                Projet & \multicolumn{1}{l|}{Non Plaf.} & \multicolumn{1}{l|}{Plafonné} '''
             for categorie in generaux.codes_d3():
                 structure_recap_projet += r'''r|'''
                 contenu_recap_projet += r''' & \multicolumn{1}{l|}{
@@ -247,7 +247,7 @@ class Annexes(object):
 
                 contenu_recap_projet += r'''
                     \hline
-                    %(num)s & %(plafond)s & %(non_plafond)s''' % dico_recap_projet
+                    %(num)s & %(non_plafond)s & %(plafond)s''' % dico_recap_projet
                 for categorie in generaux.codes_d3():
                     total += sp['tot_cat'][categorie]
                     contenu_recap_projet += r''' & ''' + "%.2f" % sp['tot_cat'][categorie]
@@ -341,9 +341,9 @@ class Annexes(object):
                                  'nj': "%.2f" % sco['nj']}
 
             ligne1 = r'''\hline
-                Montant article & %(plafond)s & %(non_plafond)s''' % dico_recap_projet
-            ligne2 = r'''Plafonnement & %(prj)s & %(nrj)s''' % dico_recap_projet
-            ligne3 = r'''Total article & %(pj)s & %(nj)s''' % dico_recap_projet
+                Montant article & %(non_plafond)s & %(plafond)s''' % dico_recap_projet
+            ligne2 = r'''Plafonnement & %(nrj)s & %(prj)s''' % dico_recap_projet
+            ligne3 = r'''Total article & %(nj)s & %(pj)s''' % dico_recap_projet
 
             sj = sco['pj'] + sco['nj']
 
@@ -371,7 +371,7 @@ class Annexes(object):
             dico_recap_compte = {'compte': intitule_compte, 'type': co['categorie'], 'plafond': "%.2f" % sco['pj'],
                                  'non_plafond': "%.2f" % sco['nj'], 'total': "%.2f" % sj}
 
-            contenu_recap_compte += r'''%(compte)s & %(type)s & %(plafond)s & %(non_plafond)s ''' \
+            contenu_recap_compte += r'''%(compte)s & %(type)s & %(non_plafond)s & %(plafond)s ''' \
                                     % dico_recap_compte
 
             for categorie in generaux.codes_d3():
@@ -394,11 +394,11 @@ class Annexes(object):
                 Compte : ''' + intitule_compte + r''' & \multicolumn{1}{l|}{Montant} & \multicolumn{1}{l|}{Rabais}
                 & \multicolumn{1}{l|}{Total} \\
                 \hline
-                Montant utilisation Machine P & %(spu)s & %(prj)s & %(pj)s \\
-                \hline
                 Montant utilisation Machine NP & %(squ)s & \multirow{2}{*}{%(nrj)s} & \multirow{2}{*}{%(nj)s} \\
                 \cline{1-2}
                 Montant Main d'oeuvre & %(som)s &  &  \\
+                \hline
+                Montant utilisation Machine P & %(spu)s & %(prj)s & %(pj)s \\
                 \hline
                 ''' % dico_recap_poste
 
@@ -518,7 +518,7 @@ class Annexes(object):
             \hline
             Emolument & %(emom)s & %(emor)s & %(emo)s \\
             \hline
-            Frias de réservation & %(resm)s & %(resr)s & %(res)s \\
+            Frais de réservation & %(resm)s & %(resr)s & %(res)s \\
             \hline
             Machine NP & %(tqm)s & \multirow{2}{*}{%(tnrj)s} & \multirow{2}{*}{%(nt)s} \\
             \cline{1-2}
@@ -548,10 +548,10 @@ class Annexes(object):
         contenu_emolument = r'''
             \hline
             \multicolumn{1}{|l|}{Emolument de base} & \multicolumn{1}{l|}{Emolument fixe} & Pente
-            & \multicolumn{1}{l|}{Total EQ R} & \multicolumn{1}{l|}{Total EQ P} & \multicolumn{1}{l|}{Total EQ NP} &
+            & \multicolumn{1}{l|}{Total EQ R} & \multicolumn{1}{l|}{Total EQ NP} & \multicolumn{1}{l|}{Total EQ P} &
             \multicolumn{1}{l|}{Total EQ} & \multicolumn{1}{l|}{Rabais émolument} \\
             \hline
-            %(emb)s & %(ef)s & %(pente)s & %(tot_eq_r)s & %(tot_eq_p)s & %(tot_eq_np)s & %(tot_eq)s & %(rabais)s \\
+            %(emb)s & %(ef)s & %(pente)s & %(tot_eq_r)s & %(tot_eq_np)s & %(tot_eq_p)s & %(tot_eq)s & %(rabais)s \\
             \hline
             ''' % dic_emo
 
@@ -602,7 +602,7 @@ class Annexes(object):
         dico_recap_compte = {'plafond': "%.2f" % scl['pt'], 'non_plafond': "%.2f" % scl['nt'],
                              'total': "%.2f" % scl['somme_t']}
 
-        contenu_recap_compte += r'''Total article & & %(plafond)s & %(non_plafond)s''' % dico_recap_compte
+        contenu_recap_compte += r'''Total article & & %(non_plafond)s & %(plafond)s''' % dico_recap_compte
 
         for categorie in generaux.codes_d3():
             contenu_recap_compte += r''' & ''' + "%.2f" % scl['tot_cat'][categorie]
