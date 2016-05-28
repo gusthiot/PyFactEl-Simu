@@ -82,6 +82,7 @@ class Facture(object):
                                      "Matricule récepteur fonds 05"])
 
             contenu = ""
+            combo_list = []
 
             for code_client in sorted(sommes.sommes_clients.keys()):
                 poste = 0
@@ -122,7 +123,8 @@ class Facture(object):
                     code_sap_traduit = self.prod2qual.traduire_code_client(code_sap)
                 else:
                     code_sap_traduit = code_sap
-    
+
+                combo_list.append(code_client + " " + cl['abrev_labo'])
                 dico_contenu = {'code': code_client, 'abrev': cl['abrev_labo'],
                                 'nom': cl['nom_labo'], 'dest': cl['dest'], 'ref': cl['ref'],
                                 'ref_fact': reference, 'texte': generaux.entete}
@@ -210,7 +212,7 @@ class Facture(object):
                     ''' + nom_annexe_technique + r'''</a>'''
                 contenu_client += "</section>"
                 contenu += contenu_client
-        self.creer_html(contenu, destination)
+        self.creer_html(contenu, destination, combo_list)
 
     def ligne_tableau(self, article, poste, net, rabais, consommateur, edition):
         montant = net - rabais
@@ -254,7 +256,7 @@ class Facture(object):
                 generaux.fonds, "", "", code_op, "", "", "", article.texte_sap,
                 consommateur]
 
-    def creer_html(self, contenu, destination):
+    def creer_html(self, contenu, destination, combo_list):
         if self.prod2qual:
             suffixe = "_qualite.html"
         else:
@@ -289,19 +291,37 @@ class Facture(object):
                 #toright {
                     text-align:right;
                 }
+                #combo {
+                    margin-top: 10px;
+                    margin-left: 50px;
+                }
                 </style>
                 <link rel="stylesheet" href="css/reveal.css">
                 <link rel="stylesheet" href="css/white.css">
                 </head>
                 <body>
+                <div id="combo">
+                <select name="client" onchange="changeClient(this)">
+                '''
+
+            for i in range(len(combo_list)):
+                html += r'''<option value="''' + str(i) + r'''">''' + str(combo_list[i]) + r'''</option>'''
+            html += r'''
+                </select>
+                </div>
                 <div class="reveal">
                 <div class="slides">
                 '''
             html += contenu
-            html += r'''</div>
+            html += r'''</div></div>
                     <script src="js/reveal.js"></script>
                     <script>
                         Reveal.initialize();
+                    </script>
+                    <script>
+                    function changeClient(sel) {
+                        Reveal.slide(sel.value, 0);
+                    }
                     </script>
                     </body>
                 </html>'''
