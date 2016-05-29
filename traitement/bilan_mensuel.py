@@ -1,5 +1,3 @@
-import csv
-
 from outils import Outils
 
 
@@ -14,7 +12,7 @@ class BilanMensuel(object):
         """
         création du bilan
 
-        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
         :param edition: paramètres d'édition
         :param sommes: sommes calculées
         :param clients: clients importés
@@ -47,8 +45,8 @@ class BilanMensuel(object):
             for code_client in sorted(sommes.sommes_clients.keys()):
                 scl = sommes.sommes_clients[code_client]
                 sca = sommes.sommes_categories[code_client]
-                cl = clients.donnees[code_client]
-                nature = generaux.nature_client_par_code_n(cl['type_labo'])
+                client = clients.donnees[code_client]
+                nature = generaux.nature_client_par_code_n(client['type_labo'])
                 reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
                 nb_u = len(BilanMensuel.utilisateurs(acces, livraisons, reservations, code_client))
                 cptes = BilanMensuel.comptes(acces, livraisons, reservations, code_client)
@@ -77,10 +75,10 @@ class BilanMensuel(object):
 
                 total = scl['somme_t'] + scl['r'] + scl['e']
 
-                ligne = [edition.annee, edition.mois, reference, code_client, cl['code_sap'], cl['abrev_labo'],
-                         cl['nom_labo'], 'U', cl['type_labo'], nb_u, nb_c, cat['1'], cat['2'], cat['3'], cat['4'],
-                         total, scl['em'], scl['somme_eq'], scl['er'], scl['r'], kprj1, kprj2, kprj3, kprj4, scl['pt'],
-                         scl['qt'], scl['ot'], scl['nt']]
+                ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'], client['abrev_labo'],
+                         client['nom_labo'], 'U', client['type_labo'], nb_u, nb_c, cat['1'], cat['2'], cat['3'],
+                         cat['4'], total, scl['em'], scl['somme_eq'], scl['er'], scl['r'], kprj1, kprj2, kprj3, kprj4,
+                         scl['pt'], scl['qt'], scl['ot'], scl['nt']]
                 for categorie in generaux.codes_d3():
                     ligne.append(scl['tot_cat'][categorie])
                 fichier_writer.writerow(ligne)

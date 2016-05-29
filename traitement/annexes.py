@@ -183,10 +183,10 @@ class Annexes(object):
         for id_compte in sorted(client_comptes.keys()):
             # ## COMPTE
 
-            co = comptes.donnees[id_compte]
-            intitule_compte = id_compte + " - " + Latex.echappe_caracteres(co['intitule'])
+            compte = comptes.donnees[id_compte]
+            intitule_compte = id_compte + " - " + Latex.echappe_caracteres(compte['intitule'])
             dico_nom = {'labo': Latex.echappe_caracteres(client['abrev_labo']),
-                        'utilisateur': Latex.echappe_caracteres(co['intitule']),
+                        'utilisateur': Latex.echappe_caracteres(compte['intitule']),
                         'date': edition.mois_txt + " " + str(edition.annee)}
             contenu_compte += r'''
                 \clearpage
@@ -208,8 +208,6 @@ class Annexes(object):
                 '''
             client_compte_projet = sommes.sommes_projets[code_client][id_compte]
             contenu_projet = ""
-
-            # machines_utilisees = {}
 
             # ## RES
             structure_res = r'''{|l|l|l|l|l|l|}'''
@@ -368,7 +366,7 @@ class Annexes(object):
 
             contenu_compte += Latex.tableau(contenu_recap_projet, structure_recap_projet, legende_recap_projet)
 
-            dico_recap_compte = {'compte': intitule_compte, 'type': co['categorie'], 'plafond': "%.2f" % sco['pj'],
+            dico_recap_compte = {'compte': intitule_compte, 'type': compte['categorie'], 'plafond': "%.2f" % sco['pj'],
                                  'non_plafond': "%.2f" % sco['nj'], 'total': "%.2f" % sj}
 
             contenu_recap_compte += r'''%(compte)s & %(type)s & %(non_plafond)s & %(plafond)s ''' \
@@ -539,7 +537,7 @@ class Annexes(object):
 
         contenu += Latex.tableau(contenu_recap_poste_cl, structure_recap_poste_cl, legende_recap_poste_cl)
 
-        dic_emo = {'emb':  "%.2f" % client['emol_base_mens'], 'ef':  "%.2f" % client['emol_fixe'],
+        dico_emolument = {'emb':  "%.2f" % client['emol_base_mens'], 'ef':  "%.2f" % client['emol_fixe'],
                    'pente': client['coef'], 'tot_eq_r': "%.2f" % scl['r'], 'tot_eq_p': "%.2f" % scl['pt'],
                    'tot_eq_np': "%.2f" % scl['qt'], 'tot_eq': "%.2f" % scl['somme_eq'], 'rabais': "%.2f" % scl['er']}
 
@@ -553,7 +551,7 @@ class Annexes(object):
             \hline
             %(emb)s & %(ef)s & %(pente)s & %(tot_eq_r)s & %(tot_eq_np)s & %(tot_eq_p)s & %(tot_eq)s & %(rabais)s \\
             \hline
-            ''' % dic_emo
+            ''' % dico_emolument
 
         contenu += Latex.tableau(contenu_emolument, structure_emolument, legende_emolument)
 

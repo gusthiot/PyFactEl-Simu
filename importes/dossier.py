@@ -1,5 +1,4 @@
 import csv
-import sys
 import os
 from contextlib import contextmanager
 
@@ -58,6 +57,7 @@ class DossierSource(_DossierBase):
     def lire(self, chemin_relatif):
         """Renvoie le contenu d'un fichier, en binaire."""
         return self._open(chemin_relatif, "rb").read()
+
 
 class DossierDestination(_DossierBase):
     """Destination de données.

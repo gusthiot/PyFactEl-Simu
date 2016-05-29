@@ -1,5 +1,3 @@
-import csv
-import sys
 from outils import Outils
 from erreurs import ErreurConsistance
 
