@@ -96,11 +96,11 @@ if prod2qual.actif:
     facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes,
                           lien_annexes, lien_annexes_techniques, annexes, annexes_techniques)
 
-# if Latex.possibles():
-#     Annexes.annexes_techniques(sommes, clients, edition, livraisons, acces, machines, reservations, prestations,
-#                                comptes, dossier_annexes_techniques, plateforme, coefprests, coefmachines, generaux)
-#     Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, prestations, comptes,
-#                     dossier_annexes, plateforme, coefprests, coefmachines, generaux)
+if Latex.possibles():
+    Annexes.annexes_techniques(sommes, clients, edition, livraisons, acces, machines, reservations, prestations,
+                               comptes, dossier_annexes_techniques, plateforme, coefprests, coefmachines, generaux)
+    Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, prestations, comptes,
+                    dossier_annexes, plateforme, coefprests, coefmachines, generaux)
 
 BilanMensuel.bilan(dossier_destination, edition, sommes, clients, generaux, acces,
                    reservations, livraisons, comptes)

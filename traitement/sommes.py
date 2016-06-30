@@ -180,7 +180,7 @@ class Sommes(object):
                             somme['sommes_cat_r'][categorie] += projet['sommes_cat_r'][categorie]
                             somme['tot_cat'][categorie] += projet['tot_cat'][categorie]
 
-                    tot = somme['mj']
+                    tot = somme['somme_j_mm']
                     for categorie in self.categories:
                         tot += somme['sommes_cat_m'][categorie]
                     if tot > 0:
