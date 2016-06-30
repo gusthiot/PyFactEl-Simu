@@ -104,9 +104,8 @@ class Generaux(object):
     def articles(self):
         """renvoie la liste des articles de facturation.
 
-        Les 2 premiers (émolument, réservation) s'appellent "D1"; les deux seconds (prix
-        plafonnés / non plafonnés) s'appellent "D2"; les suivants (en nombre
-        variable) s'appellent "D3".
+        Les deux premiers (émolument / frais de réservation) s'appelle "D1"; le second (coûts procédés machines)
+        s'appellent "D2"; les suivants (en nombre variable) s'appellent "D3".
 
         :return: une liste ordonnée d'objets Article
         """
@@ -124,7 +123,7 @@ class Generaux(object):
 
         :return: une liste ordonnée d'objets Article
         """
-        return self.articles[4:]
+        return self.articles[3:]
 
     def codes_d3(self):
         return [a.code_d for a in self.articles_d3]
@@ -137,6 +136,7 @@ class Generaux(object):
 def ajoute_accesseur_pour_valeur_unique(cls, nom, cle_csv=None):
     if cle_csv is None:
         cle_csv = nom
+
     def accesseur(self):
         return self._donnees[cle_csv][1]
     setattr(Generaux, nom, property(accesseur))
@@ -148,4 +148,5 @@ for champ_valeur_unique in ('fonds', 'entete', 'chemin', 'lien', 'min_fact_rese'
                             'origine', 'commerciale', 'poste_reservation',
                             'code_int', 'code_ext', 'code_t'):
     ajoute_accesseur_pour_valeur_unique(Generaux, champ_valeur_unique)
+
 

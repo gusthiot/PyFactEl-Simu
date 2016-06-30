@@ -9,8 +9,8 @@ class Reservation(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_compte', 'intitule_compte', 'code_client', 'abrev_labo', 'id_user', 'nom_user',
-            'prenom_user', 'id_machine', 'nom_machine', 'date_debut', 'duree_hp',
-            'duree_hc', 'si_supprime', 'duree_ouvree', 'date_reservation', 'date_suppression']
+            'prenom_user', 'id_machine', 'nom_machine', 'date_debut', 'duree_hp', 'duree_hc', 'si_supprime',
+            'duree_ouvree', 'date_reservation', 'date_suppression']
     nom_fichier = "res.csv"
     libelle = "Réservation Equipement"
 

@@ -90,7 +90,7 @@ class Facture(object):
                 scl = sommes.sommes_clients[code_client]
                 client = clients.donnees[code_client]
 
-                tot = scl['somme_t_pu'] + scl['somme_t_nm']
+                tot = scl['mt']
                 for categorie in generaux.codes_d3():
                     tot += scl['sommes_cat_m'][categorie]
                 if tot == 0 and scl['e'] == 0:
@@ -174,22 +174,14 @@ class Facture(object):
                     compte = comptes.donnees[id_compte]
                     if sco['si_facture'] > 0:
                         poste = inc*10
-                        if sco['somme_j_pu'] > 0:
+                        if sco['somme_j_mm'] > 0:
                             fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[2], poste,
-                                                                       sco['somme_j_pu'], sco['prj'], op_centre,
+                                                                       sco['somme_j_mm'], sco['somme_j_mr'], op_centre,
                                                                        compte['intitule'], edition))
-                            contenu_client += self.ligne_tableau(generaux.articles[2], poste, sco['somme_j_pu'],
-                                                                 sco['prj'], compte['intitule'], edition)
+                            contenu_client += self.ligne_tableau(generaux.articles[2], poste, sco['somme_j_mm'],
+                                                                 sco['somme_j_mr'], compte['intitule'], edition)
                             poste += 1
-    
-                        if sco['somme_j_nm'] > 0:
-                            fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[3], poste,
-                                                                       sco['somme_j_nm'], sco['nrj'], op_centre,
-                                                                       compte['intitule'], edition))
-                            contenu_client += self.ligne_tableau(generaux.articles[3], poste, sco['somme_j_nm'],
-                                                                 sco['nrj'], compte['intitule'], edition)
-                            poste += 1
-    
+
                         for article in generaux.articles_d3:
                             categorie = article.code_d
                             if sco['sommes_cat_m'][categorie] > 0:

@@ -24,23 +24,22 @@ class Rabais(object):
             return fhp, fhc
 
     @staticmethod
-    def rabais_emolument(pt, qt, ot, cat_t, emb, fix, coef_a, regle, res):
+    def rabais_emolument(rt, mt, mot, cat_t, emb, fix, coef_a, regle):
         """
         calcule le rabais sur émolument
-        :param pt: pt
-        :param qt: qt
-        :param ot: ot
+        :param rt: rt
+        :param mt: mt
+        :param mot: mot
         :param cat_t: dico des totaux des catégories de prestations
         :param emb: émolument de base mensuel
         :param fix: émolument fixe
         :param coef_a: coefficient a
         :param regle: émolument sans activité
-        :param res: frais de réservation
         :return: somme EQ, somme SB, somme T, em, er0, er
         """
-        somme_eq = pt + qt + res
-        somme_sb = pt + qt + ot
-        somme_t = pt + qt + ot
+        somme_eq = rt + mt - mot
+        somme_sb = rt + mt
+        somme_t = rt + mt
         for cat, tt in cat_t.items():
             somme_t += tt
 
@@ -51,20 +50,6 @@ class Rabais(object):
         else:
             er = er0
         return somme_eq, somme_t, em, er0, er
-
-    @staticmethod
-    def rabais_plafonnement(somme_j_pu, s, k):
-        """
-        calcule le rabais sur plafonnement
-        :param somme_j_pu: somme par compte des machines plafonnées
-        :param s: seuil
-        :param k: pourcentage appliqué après le seuil
-        :return: rabais sur montant plafonné, sur montant non-plafonné, sur main d'oeuvre opérateur
-        """
-        prj = -min(0, min(somme_j_pu, s) + k * max(0, somme_j_pu - s) - somme_j_pu)
-        qrj = 0
-        orj = 0
-        return prj, qrj, orj
 
     @staticmethod
     def rabais_reservation_petit_montant(rm, rmin):

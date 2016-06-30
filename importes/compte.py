@@ -7,7 +7,7 @@ class Compte(Fichier):
     Classe pour l'importation des données de Comptes Cmi
     """
 
-    cles = ['annee', 'mois', 'id_compte', 'intitule', 'categorie', 'code_client', 'abrev_labo', 'seuil', 'pourcent']
+    cles = ['annee', 'mois', 'id_compte', 'intitule', 'categorie', 'code_client', 'abrev_labo']
     nom_fichier = "compte.csv"
     libelle = "Comptes"
     
@@ -66,15 +66,6 @@ class Compte(Fichier):
             else:
                 msg += "l'id compte '" + donnee['id_compte'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
-
-            donnee['seuil'], info = Outils.est_un_nombre(donnee['seuil'], "le seuil", ligne)
-            if info != "":
-                print(info)
-                msg += info
-            donnee['pourcent'], info = Outils.est_un_nombre(donnee['pourcent'], "le pourcent après seuil", ligne)
-            if info != "":
-                print(info)
-                msg += info
 
             ligne += 1
 

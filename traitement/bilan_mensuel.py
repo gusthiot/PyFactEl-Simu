@@ -35,11 +35,13 @@ class BilanMensuel(object):
         with dossier_destination.writer(nom) as fichier_writer:
 
             ligne = ["année", "mois", "référence", "code client", "code client sap", "abrév. labo", "nom labo",
-                     "type client", "nature client", "nb utilisateurs", "nb tot comptes", "nb comptes cat 1",
-                     "nb comptes cat 2", "nb comptes cat 3", "nb comptes cat 4", "Total", "Em base", "somme EQ",
-                     "Rabais Em", "Total R", "Prj 1", "Prj 2", "Prj 3", "Prj 4", "Pt", "Qt", "Ot", "Nt"]
+                     "type client", "nature client", "Em base", "somme EQ", "rabais Em", "règle", "nb utilisateurs",
+                     "nb tot comptes", "nb comptes cat 1", "nb comptes cat 2", "nb comptes cat 3", "nb comptes cat 4",
+                     "total M cat 1", "total M cat 2", "total M cat 3", "total M cat 4", "MAt", "MOt", "DSt", "DHt",
+                     "Et", "Rt", "Mt"]
             for categorie in generaux.codes_d3():
                 ligne.append(categorie + "t")
+            ligne.append("total facturé HT")
             fichier_writer.writerow(ligne)
 
             for code_client in sorted(sommes.sommes_clients.keys()):
@@ -56,31 +58,21 @@ class BilanMensuel(object):
                     nb_c += 1
                     cat[comptes.donnees[cpte]['categorie']] += 1
 
-                if '1' in sca:
-                    kprj1 = sca['1']['somme_k_prj']
-                else:
-                    kprj1 = 0
-                if '2' in sca:
-                    kprj2 = sca['2']['somme_k_prj']
-                else:
-                    kprj2 = 0
-                if '3' in sca:
-                    kprj3 = sca['3']['somme_k_prj']
-                else:
-                    kprj3 = 0
-                if '4' in sca:
-                    kprj4 = sca['4']['somme_k_prj']
-                else:
-                    kprj4 = 0
+                mk = {'1': 0, '2': 0, '3': 0, '4': 0}
+                for num in mk.keys():
+                    if num in sca:
+                        mk[num] = sca[num]['mk']
 
-                total = scl['somme_t'] + scl['r'] + scl['e']
+                total = scl['somme_t'] + scl['e']
 
                 ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'], client['abrev_labo'],
-                         client['nom_labo'], 'U', client['type_labo'], nb_u, nb_c, cat['1'], cat['2'], cat['3'],
-                         cat['4'], total, scl['em'], scl['somme_eq'], scl['er'], scl['r'], kprj1, kprj2, kprj3, kprj4,
-                         scl['pt'], scl['qt'], scl['ot'], scl['nt']]
+                         client['nom_labo'], 'U', client['type_labo'], scl['em'], scl['somme_eq'], scl['er'],
+                         client['emol_sans_activite'], nb_u, nb_c, cat['1'], cat['2'], cat['3'], cat['4'], mk['1'],
+                         mk['2'], mk['3'], mk['3'], scl['mat'], scl['mot'], scl['dst'], scl['dht'], scl['e'], scl['r'],
+                         scl['mt']]
                 for categorie in generaux.codes_d3():
                     ligne.append(scl['tot_cat'][categorie])
+                ligne.append(total)
                 fichier_writer.writerow(ligne)
 
     @staticmethod

@@ -124,20 +124,32 @@ class Acces(Fichier):
             client = clients.donnees[code_client]
             coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
 
-            donnee['pu'] = round(donnee['duree_machine_hp'] / 60 * round(machine['t_h_machine_hp_p'] *
-                                                                         coefmachine['coef_p'], 2) +
-                                 donnee['duree_machine_hc'] / 60 * round(machine['t_h_machine_hc_p'] *
-                                                                         coefmachine['coef_p']), 2)
+            tm = donnee['duree_machine_hp'] / 60 + donnee['duree_machine_hc'] / 60
 
-            donnee['qu'] = round(donnee['duree_machine_hp'] / 60 * round(machine['t_h_machine_hp_np'] *
-                                                                         coefmachine['coef_np'], 2) +
-                                 donnee['duree_machine_hc'] / 60 * round(machine['t_h_machine_hc_np'] *
-                                                                         coefmachine['coef_np']), 2)
+            donnee['ai'] = round(tm * machine['t_h_machine_a'], 2)
+            donnee['bi'] = round(tm * machine['t_h_machine_b'], 2)
+            donnee['ci'] = round(tm * machine['t_h_machine_c'], 2)
 
-            donnee['om'] = round(donnee['duree_operateur_hp'] / 60 *
-                                 round(machine['t_h_operateur_hp_mo'] * coefmachine['coef_mo'], 2) +
-                                 donnee['duree_operateur_hc'] / 60 *
-                                 round(machine['t_h_operateur_hc_mo'] * coefmachine['coef_mo']), 2)
+            donnee['oi'] = round(donnee['duree_operateur_hp'] / 60 * machine['t_h_operateur_hp_mo'] +
+                                 donnee['duree_operateur_hc'] / 60 * machine['t_h_operateur_hc_mo'], 2)
+
+            pum = coefmachine['coef_a'] * machine['t_h_machine_a'] + coefmachine['coef_b'] * machine['t_h_machine_b'] +\
+                  coefmachine['coef_c'] * machine['t_h_machine_c']
+            donnee['mai'] = tm * pum
+
+            puo_hp = coefmachine['coef_mo'] * machine['t_h_operateur_hp_mo']
+            puo_hc = coefmachine['coef_mo'] * machine['t_h_operateur_hc_mo']
+            donnee['moi'] = round(donnee['duree_operateur_hp'] / 60 * puo_hp +
+                                  donnee['duree_operateur_hc'] / 60 * puo_hc, 2)
+
+            donnee['dsi'] = tm * coefmachine['coef_d'] * machine['d_h_machine_d']
+            if machine['hc'] == 1:
+                donnee['dhi'] = donnee['duree_machine_hc'] / 60 * coefmachine['coef_e'] * machine['d_h_creuses_e']
+            else:
+                donnee['dhi'] = 0
+            donnee['mm'] = donnee['mai'] + donnee['moi']
+            donnee['mr'] = donnee['dsi'] + donnee['dhi']
+            donnee['m'] = donnee['mm'] - donnee['mr']
 
             if code_client not in self.sommes:
                 self.sommes[code_client] = {}

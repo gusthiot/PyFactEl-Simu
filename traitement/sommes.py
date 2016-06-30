@@ -7,17 +7,18 @@ class Sommes(object):
     Classe contenant les méthodes pour le calcul des sommes par projet, compte, catégorie et client
     """
 
-    cles_somme_projet = ['intitule', 'somme_p_pu', 'somme_p_qu', 'somme_p_om', 'somme_p_nm']
+    cles_somme_projet = ['intitule', 'somme_p_ai', 'somme_p_bi', 'somme_p_ci', 'somme_p_oi', 'somme_p_mai',
+                         'somme_p_moi', 'somme_p_dsi', 'somme_p_dhi', 'somme_p_mm', 'somme_p_mr', 'mp']
 
-    cles_somme_compte = ['somme_j_pu', 'prj', 'pj', 'somme_j_qu', 'qrj', 'qj', 'somme_j_om', 'orj', 'oj', 'somme_j_nm',
-                         'nrj', 'nj', 'si_facture', 'res']
+    cles_somme_compte = ['somme_j_ai', 'somme_j_bi', 'somme_j_ci', 'somme_j_oi', 'somme_j_mai', 'somme_j_moi',
+                         'somme_j_dsi', 'somme_j_dhi', 'somme_j_mm', 'somme_j_mr', 'mj', 'si_facture', 'res']
 
-    cles_somme_categorie = ['somme_k_pu', 'somme_k_prj', 'pk', 'somme_k_qu', 'somme_k_qrj', 'qk', 'somme_k_om',
-                            'somme_k_orj', 'ok', 'somme_k_nm', 'somme_k_nrj', 'nk']
+    cles_somme_categorie = ['somme_k_ai', 'somme_k_bi', 'somme_k_ci', 'somme_k_oi', 'somme_k_mai', 'somme_k_moi',
+                            'somme_k_dsi', 'somme_k_dhi', 'somme_k_mm', 'somme_k_mr', 'mk']
 
-    cles_somme_client = ['somme_t_pu', 'somme_t_prj', 'pt', 'somme_t_qu', 'somme_t_qrj', 'qt', 'somme_t_om',
-                         'somme_t_orj', 'ot', 'somme_t_nm', 'somme_t_nrj', 'nt', 'somme_eq', 'somme_t',
-                         'em', 'er0', 'er', 'e', 'res', 'rm', 'rr', 'r']
+    cles_somme_client = ['somme_t_ai', 'somme_t_bi', 'somme_t_ci', 'somme_t_oi', 'mat', 'mot', 'dst', 'dht',
+                         'somme_t_mm', 'somme_t_mr', 'mt', 'somme_eq', 'somme_t', 'em', 'er0', 'er', 'e', 'res', 'rm',
+                         'rr', 'r']
 
     def __init__(self, verification, generaux):
         """
@@ -50,7 +51,7 @@ class Sommes(object):
         :param machines: machines importées et vérifiées
         """
         self.sommes_par_projet(livraisons, acces, prestations, comptes)
-        self.somme_par_compte(comptes, reservations, acces, machines)
+        self.somme_par_compte(reservations, acces, machines)
         self.somme_par_categorie(comptes)
         self.somme_par_client(clients, reservations)
 
@@ -104,11 +105,18 @@ class Sommes(object):
                 projet['intitule'] = acce['intitule_projet']
             else:
                 projet = spp_co[num_projet]
-            projet['somme_p_pu'] += acce['pu']
-            projet['somme_p_qu'] += acce['qu']
-            projet['somme_p_om'] += acce['om']
-            projet['somme_p_nm'] += acce['om']
-            projet['somme_p_nm'] += acce['qu']
+            projet['somme_p_ai'] += acce['ai']
+            projet['somme_p_bi'] += acce['bi']
+            projet['somme_p_ci'] += acce['ci']
+            projet['somme_p_oi'] += acce['oi']
+            projet['somme_p_mai'] += acce['mai']
+            projet['somme_p_moi'] += acce['moi']
+            projet['somme_p_dsi'] += acce['dsi']
+            projet['somme_p_dhi'] += acce['dhi']
+            projet['somme_p_mm'] += acce['mm']
+            projet['somme_p_mr'] += acce['mr']
+            projet['mp'] += acce['m']
+
 
         for livraison in livraisons.donnees:
             id_compte = livraison['id_compte']
@@ -137,10 +145,9 @@ class Sommes(object):
         self.sp = 1
         self.sommes_projets = spp
 
-    def somme_par_compte(self, comptes, reservations, acces, machines):
+    def somme_par_compte(self, reservations, acces, machines):
         """
         calcule les sommes par comptes sous forme de dictionnaire : client->compte->clés_sommes
-        :param comptes: comptes importés et vérifiés
         :param reservations: réservations importées et vérifiées
         :param acces: accès machines importées et vérifiés
         :param machines: machines importées et vérifiées
@@ -153,31 +160,27 @@ class Sommes(object):
                     spco[code_client] = {}
                 spco_cl = spco[code_client]
                 for id_compte, spp_co in spp_cl.items():
-                    compte = comptes.donnees[id_compte]
                     spco_cl[id_compte] = self.nouveau_somme(Sommes.cles_somme_compte)
                     somme = spco_cl[id_compte]
                     for num_projet, projet in spp_co.items():
-                        somme['somme_j_pu'] += projet['somme_p_pu']
-                        somme['somme_j_qu'] += projet['somme_p_qu']
-                        somme['somme_j_om'] += projet['somme_p_om']
-                        somme['somme_j_nm'] += projet['somme_p_nm']
+                        somme['somme_j_ai'] += projet['somme_p_ai']
+                        somme['somme_j_bi'] += projet['somme_p_bi']
+                        somme['somme_j_ci'] += projet['somme_p_ci']
+                        somme['somme_j_oi'] += projet['somme_p_oi']
+                        somme['somme_j_mai'] += projet['somme_p_mai']
+                        somme['somme_j_moi'] += projet['somme_p_moi']
+                        somme['somme_j_dsi'] += projet['somme_p_dsi']
+                        somme['somme_j_dhi'] += projet['somme_p_dhi']
+                        somme['somme_j_mm'] += projet['somme_p_mm']
+                        somme['somme_j_mr'] += projet['somme_p_mr']
+                        somme['mj'] += projet['mp']
 
                         for categorie in self.categories:
                             somme['sommes_cat_m'][categorie] += projet['sommes_cat_m'][categorie]
                             somme['sommes_cat_r'][categorie] += projet['sommes_cat_r'][categorie]
                             somme['tot_cat'][categorie] += projet['tot_cat'][categorie]
 
-                    somme['prj'], somme['qrj'], somme['orj'] = \
-                        Rabais.rabais_plafonnement(somme['somme_j_pu'],compte['seuil'], compte['pourcent'])
-
-                    somme['pj'] = somme['somme_j_pu'] - somme['prj']
-                    somme['qj'] = somme['somme_j_qu'] - somme['qrj']
-                    somme['oj'] = somme['somme_j_om'] - somme['orj']
-
-                    somme['nrj'] = somme['qrj'] + somme['orj']
-                    somme['nj'] = somme['somme_j_nm'] - somme['nrj']
-
-                    tot = somme['somme_j_pu'] + somme['somme_j_qu'] + somme['somme_j_om']
+                    tot = somme['mj']
                     for categorie in self.categories:
                         tot += somme['sommes_cat_m'][categorie]
                     if tot > 0:
@@ -247,18 +250,17 @@ class Sommes(object):
                         spca_cl[cat] = self.nouveau_somme(Sommes.cles_somme_categorie)
                     somme = spca_cl[cat]
 
-                    somme['somme_k_pu'] += spco_co['somme_j_pu']
-                    somme['somme_k_prj'] += spco_co['prj']
-                    somme['pk'] += spco_co['pj']
-                    somme['somme_k_qu'] += spco_co['somme_j_qu']
-                    somme['somme_k_qrj'] += spco_co['qrj']
-                    somme['qk'] += spco_co['qj']
-                    somme['somme_k_om'] += spco_co['somme_j_om']
-                    somme['somme_k_orj'] += spco_co['orj']
-                    somme['ok'] += spco_co['oj']
-                    somme['somme_k_nm'] += spco_co['somme_j_nm']
-                    somme['somme_k_nrj'] += spco_co['nrj']
-                    somme['nk'] += spco_co['nj']
+                    somme['somme_k_ai'] += spco_co['somme_j_ai']
+                    somme['somme_k_bi'] += spco_co['somme_j_bi']
+                    somme['somme_k_ci'] += spco_co['somme_j_ci']
+                    somme['somme_k_oi'] += spco_co['somme_j_oi']
+                    somme['somme_k_mai'] += spco_co['somme_j_mai']
+                    somme['somme_k_moi'] += spco_co['somme_j_moi']
+                    somme['somme_k_dsi'] += spco_co['somme_j_dsi']
+                    somme['somme_k_dhi'] += spco_co['somme_j_dhi']
+                    somme['somme_k_mm'] += spco_co['somme_j_mm']
+                    somme['somme_k_mr'] += spco_co['somme_j_mr']
+                    somme['mk'] += spco_co['mj']
 
                     for categorie in self.categories:
                         somme['sommes_cat_m'][categorie] += spco_co['sommes_cat_m'][categorie]
@@ -292,18 +294,18 @@ class Sommes(object):
                 spcl[code_client] = self.nouveau_somme(Sommes.cles_somme_client)
                 somme = spcl[code_client]
                 for cat, som_cat in spca_cl.items():
-                    somme['somme_t_pu'] += som_cat['somme_k_pu']
-                    somme['somme_t_prj'] += som_cat['somme_k_prj']
-                    somme['pt'] += som_cat['pk']
-                    somme['somme_t_qu'] += som_cat['somme_k_qu']
-                    somme['somme_t_qrj'] += som_cat['somme_k_qrj']
-                    somme['qt'] += som_cat['qk']
-                    somme['somme_t_om'] += som_cat['somme_k_om']
-                    somme['somme_t_orj'] += som_cat['somme_k_orj']
-                    somme['ot'] += som_cat['ok']
-                    somme['somme_t_nm'] += som_cat['somme_k_nm']
-                    somme['somme_t_nrj'] += som_cat['somme_k_nrj']
-                    somme['nt'] += som_cat['nk']
+
+                    somme['somme_t_ai'] += som_cat['somme_k_ai']
+                    somme['somme_t_bi'] += som_cat['somme_k_bi']
+                    somme['somme_t_ci'] += som_cat['somme_k_ci']
+                    somme['somme_t_oi'] += som_cat['somme_k_oi']
+                    somme['mat'] += som_cat['somme_k_mai']
+                    somme['mot'] += som_cat['somme_k_moi']
+                    somme['dst'] += som_cat['somme_k_dsi']
+                    somme['dht'] += som_cat['somme_k_dhi']
+                    somme['somme_t_mm'] += som_cat['somme_k_mm']
+                    somme['somme_t_mr'] += som_cat['somme_k_mr']
+                    somme['mt'] += som_cat['mk']
 
                     for categorie in self.categories:
                         somme['sommes_cat_m'][categorie] += som_cat['sommes_cat_m'][categorie]
@@ -335,9 +337,9 @@ class Sommes(object):
                 client = clients.donnees[code_client]
 
                 somme['somme_eq'], somme['somme_t'], somme['em'], somme['er0'], somme['er'] = \
-                    Rabais.rabais_emolument(somme['pt'], somme['qt'], somme['ot'], somme['tot_cat'],
+                    Rabais.rabais_emolument(somme['r'], somme['mt'], somme['mot'], somme['tot_cat'],
                                             client['emol_base_mens'], client['emol_fixe'], client['coef'],
-                                            client['emol_sans_activite'], somme['r'])
+                                            client['emol_sans_activite'])
                 somme['e'] = somme['em'] - somme['er']
 
             self.calculees = 1

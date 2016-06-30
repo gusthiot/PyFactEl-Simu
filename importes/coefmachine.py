@@ -8,7 +8,8 @@ class CoefMachine(Fichier):
     """
 
     nom_fichier = "coeffmachine.csv"
-    cles = ['annee', 'mois', 'id_classe_tarif', 'intitule', 'categorie', 'coef_p', 'coef_np', 'coef_mo', 'coef_r']
+    cles = ['annee', 'mois', 'id_classe_tarif', 'intitule', 'categorie', 'coef_a', 'coef_b', 'coef_c', 'coef_d',
+            'coef_e', 'coef_mo', 'coef_r']
     libelle = "Coefficients Machines"
 
     def __init__(self, *args, **kwargs):
@@ -87,9 +88,15 @@ class CoefMachine(Fichier):
                     msg += "Couple categorie '" + donnee['categorie'] + "' et classe de tarif '" + \
                            donnee['id_classe_tarif'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['coef_p'], info = Outils.est_un_nombre(donnee['coef_p'], "le coefficient P", ligne)
+            donnee['coef_a'], info = Outils.est_un_nombre(donnee['coef_a'], "le coefficient A", ligne)
             msg += info
-            donnee['coef_np'], info = Outils.est_un_nombre(donnee['coef_np'], "le coefficient NP", ligne)
+            donnee['coef_b'], info = Outils.est_un_nombre(donnee['coef_b'], "le coefficient B", ligne)
+            msg += info
+            donnee['coef_c'], info = Outils.est_un_nombre(donnee['coef_c'], "le coefficient C", ligne)
+            msg += info
+            donnee['coef_d'], info = Outils.est_un_nombre(donnee['coef_d'], "le coefficient D", ligne)
+            msg += info
+            donnee['coef_e'], info = Outils.est_un_nombre(donnee['coef_e'], "le coefficient E", ligne)
             msg += info
             donnee['coef_mo'], info = Outils.est_un_nombre(donnee['coef_mo'], "le coefficient MO", ligne)
             msg += info
