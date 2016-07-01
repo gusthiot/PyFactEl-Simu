@@ -133,14 +133,14 @@ class Acces(Fichier):
             donnee['oi'] = round(donnee['duree_operateur_hp'] / 60 * machine['t_h_operateur_hp_mo'] +
                                  donnee['duree_operateur_hc'] / 60 * machine['t_h_operateur_hc_mo'], 2)
 
-            pum = coefmachine['coef_a'] * machine['t_h_machine_a'] + coefmachine['coef_b'] * machine['t_h_machine_b'] +\
+            donnee['pum'] = coefmachine['coef_a'] * machine['t_h_machine_a'] + coefmachine['coef_b'] * machine['t_h_machine_b'] +\
                   coefmachine['coef_c'] * machine['t_h_machine_c']
-            donnee['mai'] = tm * pum
+            donnee['mai'] = tm * donnee['pum']
 
-            puo_hp = coefmachine['coef_mo'] * machine['t_h_operateur_hp_mo']
-            puo_hc = coefmachine['coef_mo'] * machine['t_h_operateur_hc_mo']
-            donnee['moi'] = round(donnee['duree_operateur_hp'] / 60 * puo_hp +
-                                  donnee['duree_operateur_hc'] / 60 * puo_hc, 2)
+            donnee['puo_hp'] = coefmachine['coef_mo'] * machine['t_h_operateur_hp_mo']
+            donnee['puo_hc'] = coefmachine['coef_mo'] * machine['t_h_operateur_hc_mo']
+            donnee['moi'] = round(donnee['duree_operateur_hp'] / 60 * donnee['puo_hp'] +
+                                  donnee['duree_operateur_hc'] / 60 * donnee['puo_hc'], 2)
 
             donnee['dsi'] = tm * coefmachine['coef_d'] * machine['d_h_machine_d']
             if machine['hc'] == 1:

@@ -253,45 +253,49 @@ class Annexes(object):
                     \hline
                     ''' % dico_recap_projet
 
-                # ## CAE
-                # structure_cae = r'''{|l|l|l|l|l|l||r|r|r||r|r|r|}'''
-                # dico_cae = {'compte': intitule_compte, 'projet': intitule_projet}
-                # contenu_cae = r'''
-                #     \hline
-                #     \multicolumn{3}{|l|}{%(compte)s / %(projet)s} & & \multicolumn{2}{l||}{hh:mm} &
-                #     \multicolumn{3}{l||}{CHF/h} & \multicolumn{3}{l|}{CHF} \\
-                #     \hline
-                #     Date & Heure & Equipement & & mach. & oper. & \multicolumn{1}{l|}{P} & \multicolumn{1}{l|}{NP}
-                #     & \multicolumn{1}{l||}{OP} & \multicolumn{1}{l|}{P} & \multicolumn{1}{l|}{NP}
-                #     & \multicolumn{1}{l|}{OP} \\
-                #     \hline
-                #     ''' % dico_cae
-                # nombre_cae = 0
-                # legende_cae = r'''Récapitulatif Utilisation machines : ''' + intitule_compte + r''' / ''' +\
-                #               intitule_projet
-                #
-                # cae_proj = acces.acces_pour_projet(num_projet, id_compte, code_client)
-                # resultats = [0, 0, 0]
-                # for cae in cae_proj:
-                #     nombre_cae += 1
-                #     machine = machines.donnees[cae['id_machine']]
-                #     coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
-                #     ligne, resultat = Annexes.ligne_cae(cae, machine, coefmachine)
-                #     resultats[0] += resultat[0]
-                #     resultats[1] += resultat[1]
-                #     resultats[2] += resultat[2]
-                #     contenu_cae += ligne
-                #
-                # contenu_cae += r'''
-                #     \multicolumn{9}{|r||}{Total} & ''' + Outils.format_si_nul(resultats[0]) + r'''
-                #     & ''' + Outils.format_si_nul(resultats[1]) + r'''
-                #     & ''' + Outils.format_si_nul(resultats[2]) + r''' \\
-                #     \hline
-                #     '''
-                #
-                # if nombre_cae > 0:
-                #     contenu_projet += Latex.long_tableau(contenu_cae, structure_cae, legende_cae)
-                # ## cae
+                ## CAE
+                structure_cae = r'''{|l|l|l|c|c|c|c|c|c|c|c|c|c|}'''
+                dico_cae = {'compte': intitule_compte, 'projet': intitule_projet}
+                contenu_cae = r'''
+                    \hline
+                    \multicolumn{3}{|l|}{%(compte)s / %(projet)s} & & \multicolumn{2}{c|}{hh:mm} &
+                    \multicolumn{2}{c|}{CHF/h} & Montant & \multicolumn{2}{c|}{Déductions} & Montant & Montant \\
+                    \cline{1-8}
+                    \cline{10-11}
+                    Date & Heure & Equipement & & mach. & oper. & mach. & MO & machine &
+                    Speciales & HC & main d'oeuvre & net \\
+                    \hline
+                    ''' % dico_cae
+                nombre_cae = 0
+                legende_cae = r'''Récapitulatif Utilisation machines : ''' + intitule_compte + r''' / ''' +\
+                              intitule_projet
+
+                cae_proj = acces.acces_pour_projet(num_projet, id_compte, code_client)
+                resultats = [0, 0, 0, 0, 0]
+                for cae in cae_proj:
+                    nombre_cae += 1
+                    machine = machines.donnees[cae['id_machine']]
+                    coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
+                    ligne, resultat = Annexes.ligne_cae(cae, machine, coefmachine)
+                    resultats[0] += resultat[0]
+                    resultats[1] += resultat[1]
+                    resultats[2] += resultat[2]
+                    resultats[3] += resultat[3]
+                    resultats[4] += resultat[4]
+                    contenu_cae += ligne
+
+                contenu_cae += r'''
+                    \multicolumn{8}{|r|}{Total} & ''' + Outils.format_si_nul(resultats[0]) + r'''
+                    & ''' + Outils.format_si_nul(resultats[1]) + r'''
+                    & ''' + Outils.format_si_nul(resultats[2]) + r'''
+                    & ''' + Outils.format_si_nul(resultats[3]) + r'''
+                    & ''' + Outils.format_si_nul(resultats[4]) + r''' \\
+                    \hline
+                    '''
+
+                if nombre_cae > 0:
+                    contenu_projet += Latex.long_tableau(contenu_cae, structure_cae, legende_cae)
+                ## cae
 
                 # ## LIV
                 structure_liv = r'''{|l|l|l|l|r|r|r|r|}'''
@@ -648,19 +652,6 @@ class Annexes(object):
         :return: ligne de tableau latex
         """
 
-        t1 = machine['t_h_machine_hp_p'] * coefmachine['coef_p']
-        t2 = machine['t_h_machine_hp_np'] * coefmachine['coef_np']
-        t3 = machine['t_h_operateur_hp_mo'] * coefmachine['coef_mo']
-        t4 = machine['t_h_machine_hc_p'] * coefmachine['coef_p']
-        t5 = machine['t_h_machine_hc_np'] * coefmachine['coef_np']
-        t6 = machine['t_h_operateur_hc_mo'] * coefmachine['coef_mo']
-
-        p1 = round(t1 * cae['duree_machine_hp'] / 60, 2)
-        p2 = round(t2 * cae['duree_machine_hp'] / 60, 2)
-        p3 = round(t3 * cae['duree_operateur_hp'] / 60, 2)
-        p4 = round(t4 * cae['duree_machine_hc'] / 60, 2)
-        p5 = round(t5 * cae['duree_machine_hc'] / 60, 2)
-        p6 = round(t6 * cae['duree_operateur_hc'] / 60, 2)
         login = Latex.echappe_caracteres(cae['date_login']).split()
         temps = login[0].split('-')
         date = temps[0]
@@ -671,18 +662,29 @@ class Annexes(object):
         else:
             heure = ""
 
+        mai_hp = cae['duree_machine_hp']/60 * cae['pum']
+        mai_hc = cae['duree_machine_hc']/60 * cae['pum']
+        dsi_hp = cae['duree_machine_hp']/60 * coefmachine['coef_d'] * machine['d_h_machine_d']
+        dsi_hc = cae['duree_machine_hc']/60 * coefmachine['coef_d'] * machine['d_h_machine_d']
+        dhi = cae['dhi']
+        moi_hp = cae['duree_operateur_hp']/60 * cae['puo_hp']
+        moi_hc = cae['duree_operateur_hc']/60 * cae['puo_hc']
+        m_hp = mai_hp + moi_hp - dsi_hp
+        m_hc = mai_hc + moi_hc - dsi_hc - dhi
+
         dico = {'date': date, 'heure': heure,
                 'machine': Latex.echappe_caracteres(cae['nom_machine']),
                 'operateur': Latex.echappe_caracteres(cae['nom_op']),
                 'rem_op': Latex.echappe_caracteres(cae['remarque_op']),
                 'rem_staff': Latex.echappe_caracteres(cae['remarque_staff']),
-                'deq_hp': Outils.format_heure(cae['duree_machine_hp']),
-                'dmo_hp': Outils.format_heure(cae['duree_operateur_hp']),
-                'deq_hc': Outils.format_heure(cae['duree_machine_hc']),
-                'dmo_hc': Outils.format_heure(cae['duree_operateur_hc']),
-                't1': "%d" % t1, 't2': "%d" % t2, 't3': "%d" % t3, 't4': "%d" % t4, 't5': "%d" % t5, 't6': "%d" % t6,
-                'p1': Outils.format_si_nul(p1), 'p2': Outils.format_si_nul(p2), 'p3': Outils.format_si_nul(p3),
-                'p4': Outils.format_si_nul(p4), 'p5': Outils.format_si_nul(p5), 'p6': Outils.format_si_nul(p6)}
+                'tm_hp': Outils.format_heure(cae['duree_machine_hp']),
+                'to_hp': Outils.format_heure(cae['duree_operateur_hp']),
+                'tm_hc': Outils.format_heure(cae['duree_machine_hc']),
+                'to_hc': Outils.format_heure(cae['duree_operateur_hc']),
+                'pum': cae['pum'], 'puo_hp': cae['puo_hp'], 'puo_hc': cae['puo_hc'], 'mai_hp': "%.2f" % mai_hp,
+                'mai_hc': "%.2f" % mai_hc, 'dsi_hp': Outils.format_si_nul(dsi_hp),
+                'dsi_hc': Outils.format_si_nul(dsi_hc), 'dhi_hp': '-', 'dhi_hc': Outils.format_si_nul(dhi),
+                'moi_hp': "%.2f" % moi_hp, 'moi_hc': "%.2f" % moi_hc, 'm_hp': "%.2f" % m_hp, 'm_hc': "%.2f" % m_hc}
 
         nb = 0
         if (cae['duree_machine_hp'] > 0) or (cae['duree_operateur_hp'] > 0):
@@ -692,7 +694,7 @@ class Annexes(object):
             nb += 1
 
         if nb == 0:
-            return "", [0, 0, 0]
+            return "", [0, 0, 0, 0, 0]
 
         if (cae['remarque_staff'] != "") or (cae['remarque_op'] != ""):
             nb += 1
@@ -705,8 +707,8 @@ class Annexes(object):
 
         nb = 0
         if (cae['duree_machine_hp'] > 0) or (cae['duree_operateur_hp'] > 0):
-            ligne += r''' & %(machine)s & HP & %(deq_hp)s & %(dmo_hp)s & %(t1)s & %(t2)s & %(t3)s &
-                %(p1)s & %(p2)s & %(p3)s \\
+            ligne += r''' & %(machine)s & HP & %(tm_hp)s & %(to_hp)s & %(pum)s & %(puo_hp)s & %(mai_hp)s &
+                %(dsi_hp)s & %(dhi_hp)s & %(moi_hp)s & %(m_hp)s \\
                 ''' % dico
             nb += 1
 
@@ -715,18 +717,18 @@ class Annexes(object):
                 ligne += r'''& &'''
             else:
                 ligne += r'''& %(machine)s ''' % dico
-            ligne += r''' & HC & %(deq_hc)s & %(dmo_hc)s & %(t4)s & %(t5)s & %(t6)s &
-                %(p4)s & %(p5)s & %(p6)s \\
+            ligne += r''' & HC & %(tm_hc)s & %(to_hc)s & %(pum)s & %(puo_hc)s & %(mai_hc)s &
+                %(dsi_hc)s & %(dhi_hc)s & %(moi_hc)s & %(m_hc)s \\
                 ''' % dico
 
         if (cae['remarque_staff'] != "") or (cae['remarque_op'] != ""):
-            ligne += r'''\cline{3-12}
-                &  & \multicolumn{10}{l|}{%(operateur)s ; %(rem_op)s ; %(rem_staff)s}\\
+            ligne += r'''\cline{3-13}
+                &  & \multicolumn{11}{l|}{%(operateur)s ; %(rem_op)s ; %(rem_staff)s}\\
                 ''' % dico
 
         ligne += r'''\hline
             '''
-        return ligne, [(p1 + p4), (p2 + p5), (p3 + p6)]
+        return ligne, [(mai_hp + mai_hc), (dsi_hp + dsi_hc), dhi, (moi_hp + moi_hc), (m_hp + m_hc)]
 
     @staticmethod
     def ligne_res(res):
