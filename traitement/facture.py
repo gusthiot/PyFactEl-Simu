@@ -251,6 +251,8 @@ class Facture(object):
         :param edition: paramètres d'édition
         :return: ligne de facturation formatée
         """
+        net = "%.2f" % net
+        rabais = "%.2f" % rabais
         if rabais == 0:
             rabais = ""
         code_op = generaux.code_t + op_centre + article.code_d

@@ -66,13 +66,13 @@ class BilanMensuel(object):
                 total = scl['somme_t'] + scl['e']
 
                 ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'], client['abrev_labo'],
-                         client['nom_labo'], 'U', client['type_labo'], scl['em'], scl['somme_eq'], scl['er'],
-                         client['emol_sans_activite'], nb_u, nb_c, cat['1'], cat['2'], cat['3'], cat['4'], mk['1'],
-                         mk['2'], mk['3'], mk['3'], scl['mat'], scl['mot'], scl['dst'], scl['dht'], scl['e'], scl['r'],
-                         scl['mt']]
+                         client['nom_labo'], 'U', client['type_labo'], scl['em'], "%.2f" % scl['somme_eq'], scl['er'],
+                         client['emol_sans_activite'], nb_u, nb_c, cat['1'], cat['2'], cat['3'], cat['4'],
+                         "%.2f" % mk['1'], "%.2f" % mk['2'], "%.2f" % mk['3'], "%.2f" % mk['4'], "%.2f" % scl['mat'],
+                         scl['mot'], scl['dst'], scl['dht'], scl['e'], scl['r'], "%.2f" % scl['mt']]
                 for categorie in generaux.codes_d3():
                     ligne.append(scl['tot_cat'][categorie])
-                ligne.append(total)
+                ligne.append("%.2f" % total)
                 fichier_writer.writerow(ligne)
 
     @staticmethod
