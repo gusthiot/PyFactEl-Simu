@@ -177,6 +177,14 @@ class Annexes(object):
             \hline
             '''
 
+        structure_recap_eligibles = r'''{|l|c|c|c|c|c|c|c|}'''
+        legende_recap_eligibles = r'''Coûts procédés éligibles des comptes pour client ''' + intitule_client
+        contenu_recap_eligibles = r'''
+            \hline
+            Compte & Coûts A & Coûts O & Coûts B & Coûts C & Coûts U1 & Coûts U2 & Coûts U3 \\
+            \hline
+            '''
+
         client_comptes = sommes.sommes_comptes[code_client]
         contenu_compte = ""
 
@@ -366,6 +374,19 @@ class Annexes(object):
             contenu_recap_compte += r'''& %(total)s \\
                     \hline
                     ''' % dico_recap_compte
+
+            u1 = sco['somme_j_ai'] + sco['somme_j_oi']
+            u2 = u1 + sco['somme_j_bi']
+            u3 = u2 + sco['somme_j_ci']
+            dico_recap_eligibles = {'compte': intitule_compte, 'couts_a': "%.2f" % sco['somme_j_ai'],
+                                    'couts_o': "%.2f" % sco['somme_j_oi'], 'couts_b': "%.2f" % sco['somme_j_bi'],
+                                    'couts_c': "%.2f" % sco['somme_j_ci'], 'u1': "%.2f" % u1, 'u2': "%.2f" % u2,
+                                    'u3': "%.2f" % u3}
+
+            contenu_recap_eligibles += r'''%(compte)s & %(couts_a)s & %(couts_o)s & %(couts_b)s & %(couts_c)s &
+                %(u1)s & %(u2)s & %(u3)s \\
+                \hline
+                ''' % dico_recap_eligibles
 
             structure_recap_poste = r'''{|l|r|r|r|}'''
             legende_recap_poste = r'''Récapitulatif postes pour compte ''' + intitule_compte
@@ -591,8 +612,19 @@ class Annexes(object):
 
         contenu += Latex.tableau(contenu_recap_compte, structure_recap_compte, legende_recap_compte)
 
+        u1 = scl['somme_t_ai'] + scl['somme_t_oi']
+        u2 = u1 + scl['somme_t_bi']
+        u3 = u2 + scl['somme_t_ci']
+        dico_recap_eligibles = {'ait': "%.2f" % scl['somme_t_ai'], 'oit': "%.2f" % scl['somme_t_oi'],
+                                'bit': "%.2f" % scl['somme_t_bi'], 'cit': "%.2f" % scl['somme_t_ci'], 'u1': "%.2f" % u1,
+                                'u2': "%.2f" % u2, 'u3': "%.2f" % u3}
 
-        #### nouveau tableau couts eligibles
+        contenu_recap_eligibles += r'''Total article & %(ait)s & %(oit)s & %(bit)s & %(cit)s & %(u1)s & %(u2)s &
+            %(u3)s \\
+            \hline
+            ''' % dico_recap_eligibles
+
+        contenu += Latex.tableau(contenu_recap_eligibles, structure_recap_eligibles, legende_recap_eligibles)
 
         structure_recap_cat_cl = r'''{|l|r|r|r|}'''
         legende_recap_cat_cl = r'''Détail par catégorie pour client ''' + intitule_client
