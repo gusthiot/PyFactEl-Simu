@@ -57,7 +57,7 @@ class Compte(Fichier):
                 continue
 
             if donnee['id_compte'] == "":
-                msg += "le compte id de la ligne " + ligne + " ne peut être vide\n"
+                msg += "le compte id de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_compte'] not in ids:
                 ids.append(donnee['id_compte'])
                 del donnee['annee']
