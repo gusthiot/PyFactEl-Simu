@@ -194,7 +194,7 @@ class Facture(object):
                                                                      edition)
                                 poste += 1
                         inc += 1
-                net_amount = scl['somme_t'] + scl['em'] - scl['er'] + scl['r']
+                net_amount = scl['somme_t'] + scl['e']
                 contenu_client += r'''
                     <tr><td colspan="8" id="toright">Net amount [CHF] : </td><td id="toright">
                     ''' + "%.2f" % net_amount + r'''</td></tr>

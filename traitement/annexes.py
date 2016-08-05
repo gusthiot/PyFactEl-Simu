@@ -177,11 +177,11 @@ class Annexes(object):
             \hline
             '''
 
-        structure_recap_eligibles = r'''{|l|c|c|c|c|c|c|c|}'''
+        structure_recap_eligibles = r'''{|l|c|c|c|c|c|c|c|c|}'''
         legende_recap_eligibles = r'''Coûts procédés éligibles des comptes pour client ''' + intitule_client
         contenu_recap_eligibles = r'''
             \hline
-            Compte & Coûts A & Coûts O & Coûts B & Coûts C & Coûts U1 & Coûts U2 & Coûts U3 \\
+            Compte & Coûts A & Coûts B & Coûts C & Coûts U1 & Coûts U2 & Coûts U3 & Coûts MO & Coûts CO \\
             \hline
             '''
 
@@ -271,7 +271,7 @@ class Annexes(object):
                     \cline{1-8}
                     \cline{10-11}
                     Date & Heure & Equipement & & mach. & oper. & mach. & MO & machine &
-                    Speciales & HC & main d'oeuvre & net \\
+                    spé. & HC & MO & net \\
                     \hline
                     ''' % dico_cae
                 nombre_cae = 0
@@ -375,16 +375,20 @@ class Annexes(object):
                     \hline
                     ''' % dico_recap_compte
 
-            u1 = sco['somme_j_ai'] + sco['somme_j_oi']
+            u1 = sco['somme_j_ai']
             u2 = u1 + sco['somme_j_bi']
             u3 = u2 + sco['somme_j_ci']
-            dico_recap_eligibles = {'compte': intitule_compte, 'couts_a': "%.2f" % sco['somme_j_ai'],
-                                    'couts_o': "%.2f" % sco['somme_j_oi'], 'couts_b': "%.2f" % sco['somme_j_bi'],
-                                    'couts_c': "%.2f" % sco['somme_j_ci'], 'u1': "%.2f" % u1, 'u2': "%.2f" % u2,
-                                    'u3': "%.2f" % u3}
+            couts_co = 0
+            for cat, tt in sco['tot_cat'].items():
+                couts_co += tt
 
-            contenu_recap_eligibles += r'''%(compte)s & %(couts_a)s & %(couts_o)s & %(couts_b)s & %(couts_c)s &
-                %(u1)s & %(u2)s & %(u3)s \\
+            dico_recap_eligibles = {'compte': intitule_compte, 'couts_a': "%.2f" % sco['somme_j_ai'],
+                                    'couts_mo': "%.2f" % sco['somme_j_oi'], 'couts_b': "%.2f" % sco['somme_j_bi'],
+                                    'couts_c': "%.2f" % sco['somme_j_ci'], 'u1': "%.2f" % u1, 'u2': "%.2f" % u2,
+                                    'u3': "%.2f" % u3, 'couts_co': "%.2f" % couts_co}
+
+            contenu_recap_eligibles += r'''%(compte)s & %(couts_a)s & %(couts_b)s & %(couts_c)s &
+                %(u1)s & %(u2)s & %(u3)s & %(couts_mo)s & %(couts_co)s \\
                 \hline
                 ''' % dico_recap_eligibles
 
@@ -612,15 +616,18 @@ class Annexes(object):
 
         contenu += Latex.tableau(contenu_recap_compte, structure_recap_compte, legende_recap_compte)
 
-        u1 = scl['somme_t_ai'] + scl['somme_t_oi']
+        u1 = scl['somme_t_ai']
         u2 = u1 + scl['somme_t_bi']
         u3 = u2 + scl['somme_t_ci']
-        dico_recap_eligibles = {'ait': "%.2f" % scl['somme_t_ai'], 'oit': "%.2f" % scl['somme_t_oi'],
+        tot_co = 0
+        for cat, tt in scl['tot_cat'].items():
+            tot_co += tt
+        dico_recap_eligibles = {'ait': "%.2f" % scl['somme_t_ai'], 'moit': "%.2f" % scl['somme_t_oi'],
                                 'bit': "%.2f" % scl['somme_t_bi'], 'cit': "%.2f" % scl['somme_t_ci'], 'u1': "%.2f" % u1,
-                                'u2': "%.2f" % u2, 'u3': "%.2f" % u3}
+                                'u2': "%.2f" % u2, 'u3': "%.2f" % u3, 'coit': "%.2f" % tot_co}
 
-        contenu_recap_eligibles += r'''Total article & %(ait)s & %(oit)s & %(bit)s & %(cit)s & %(u1)s & %(u2)s &
-            %(u3)s \\
+        contenu_recap_eligibles += r'''Total article & %(ait)s & %(bit)s & %(cit)s & %(u1)s & %(u2)s &
+            %(u3)s & %(moit)s & %(coit)s \\
             \hline
             ''' % dico_recap_eligibles
 
@@ -630,10 +637,9 @@ class Annexes(object):
         legende_recap_cat_cl = r'''Détail par catégorie pour client ''' + intitule_client
 
         dico_recap_cat_cl = {'mmk1': '0.00', 'mrk1': '0.00', 'mk1': '0.00', 'mmk2': '0.00', 'mrk2': '0.00',
-                               'mk2': '0.00', 'mmk3': '0.00', 'mrk3': '0.00', 'mk3': '0.00', 'mmk4': '0.00',
-                               'mrk4': '0.00', 'mk4': '0.00',
-                               'mm': "%.2f" % scl['somme_t_mm'], 'mr': "%.2f" % scl['somme_t_mr'],
-                               'mt': "%.2f" % scl['mt']}
+                             'mk2': '0.00', 'mmk3': '0.00', 'mrk3': '0.00', 'mk3': '0.00', 'mmk4': '0.00',
+                             'mrk4': '0.00', 'mk4': '0.00', 'mm': "%.2f" % scl['somme_t_mm'],
+                             'mr': "%.2f" % scl['somme_t_mr'], 'mt': "%.2f" % scl['mt']}
 
         if '1' in sca:
             dico_recap_cat_cl['mmk1'] = "%.2f" % sca['1']['somme_k_mm']
