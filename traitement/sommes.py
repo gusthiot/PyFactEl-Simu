@@ -117,7 +117,6 @@ class Sommes(object):
             projet['somme_p_mr'] += acce['mr']
             projet['mp'] += acce['m']
 
-
         for livraison in livraisons.donnees:
             id_compte = livraison['id_compte']
             code_client = comptes.donnees[id_compte]['code_client']
@@ -141,6 +140,19 @@ class Sommes(object):
             projet['sommes_cat_m'][prestation['categorie']] += livraison['montant']
             projet['sommes_cat_r'][prestation['categorie']] += livraison['rabais_r']
             projet['tot_cat'][prestation['categorie']] += livraison['montant'] - livraison['rabais_r']
+
+        # print("spp")
+        # for code in spp:
+        #     if code != "220208":
+        #         continue
+        #     print(code)
+        #     spp_cl = spp[code]
+        #     for id in spp_cl:
+        #         print("   ", id)
+        #         spp_co = spp_cl[id]
+        #         for num in spp_co:
+        #             projet = spp_co[num]
+        #             print("   ", "   ", num, projet['somme_p_mai'])
 
         self.sp = 1
         self.sommes_projets = spp
@@ -218,6 +230,17 @@ class Sommes(object):
                             pen_hc = mini_hc
                         somme['res'][mach_u] = {'pen_hp': round(pen_hp/60, 1), 'pen_hc': round(pen_hc/60, 1)}
 
+            # print("")
+            # print("spco")
+            # for code in spco:
+            #     if code != "220208":
+            #         continue
+            #     print(code)
+            #     spco_cl = spco[code]
+            #     for id in spco_cl:
+            #         somme = spco_cl[id]
+            #         print("   ", id, somme['somme_j_mai'])
+
             self.sco = 1
             self.sommes_comptes = spco
 
@@ -266,6 +289,17 @@ class Sommes(object):
                         somme['sommes_cat_m'][categorie] += spco_co['sommes_cat_m'][categorie]
                         somme['sommes_cat_r'][categorie] += spco_co['sommes_cat_r'][categorie]
                         somme['tot_cat'][categorie] += spco_co['tot_cat'][categorie]
+
+            # print("")
+            # print("spca")
+            # for code in spca:
+            #     if code != "220208":
+            #         continue
+            #     print(code)
+            #     spca_cl = spca[code]
+            #     for cat in spca_cl:
+            #         somme = spca_cl[cat]
+            #         print("   ", cat, somme['somme_k_mai'])
 
             self.sca = 1
             self.sommes_categories = spca
@@ -341,6 +375,14 @@ class Sommes(object):
                                             client['emol_base_mens'], client['emol_fixe'], client['coef'],
                                             client['emol_sans_activite'])
                 somme['e'] = somme['em'] - somme['er']
+
+            # print("")
+            # print("spcl")
+            # for code in spcl:
+            #     if code != "220208":
+            #         continue
+            #     somme = spcl[code]
+            #     print(code, somme['mat'])
 
             self.calculees = 1
             self.sommes_clients = spcl

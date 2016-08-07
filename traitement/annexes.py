@@ -700,13 +700,13 @@ class Annexes(object):
         else:
             heure = ""
 
-        mai_hp = cae['duree_machine_hp']/60 * cae['pum']
-        mai_hc = cae['duree_machine_hc']/60 * cae['pum']
-        dsi_hp = cae['duree_machine_hp']/60 * coefmachine['coef_d'] * machine['d_h_machine_d']
-        dsi_hc = cae['duree_machine_hc']/60 * coefmachine['coef_d'] * machine['d_h_machine_d']
+        mai_hp = round(cae['duree_machine_hp']/60 * cae['pum'], 2)
+        mai_hc = round(cae['duree_machine_hc']/60 * cae['pum'], 2)
+        dsi_hp = round(cae['duree_machine_hp']/60 * coefmachine['coef_d'] * machine['d_h_machine_d'], 2)
+        dsi_hc = round(cae['duree_machine_hc']/60 * coefmachine['coef_d'] * machine['d_h_machine_d'], 2)
         dhi = cae['dhi']
-        moi_hp = cae['duree_operateur_hp']/60 * cae['puo_hp']
-        moi_hc = cae['duree_operateur_hc']/60 * cae['puo_hc']
+        moi_hp = round(cae['duree_operateur_hp']/60 * cae['puo_hp'], 2)
+        moi_hc = round(cae['duree_operateur_hc']/60 * cae['puo_hc'], 2)
         m_hp = mai_hp + moi_hp - dsi_hp
         m_hc = mai_hc + moi_hc - dsi_hc - dhi
 

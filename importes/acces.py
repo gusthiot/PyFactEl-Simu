@@ -135,16 +135,16 @@ class Acces(Fichier):
 
             donnee['pum'] = coefmachine['coef_a'] * machine['t_h_machine_a'] + coefmachine['coef_b'] * machine['t_h_machine_b'] +\
                   coefmachine['coef_c'] * machine['t_h_machine_c']
-            donnee['mai'] = tm * donnee['pum']
+            donnee['mai'] = round(tm * donnee['pum'], 2)
 
             donnee['puo_hp'] = coefmachine['coef_mo'] * machine['t_h_operateur_hp_mo']
             donnee['puo_hc'] = coefmachine['coef_mo'] * machine['t_h_operateur_hc_mo']
             donnee['moi'] = round(donnee['duree_operateur_hp'] / 60 * donnee['puo_hp'] +
                                   donnee['duree_operateur_hc'] / 60 * donnee['puo_hc'], 2)
 
-            donnee['dsi'] = tm * coefmachine['coef_d'] * machine['d_h_machine_d']
+            donnee['dsi'] = round(tm * coefmachine['coef_d'] * machine['d_h_machine_d'],2)
             if machine['hc'] == 1:
-                donnee['dhi'] = donnee['duree_machine_hc'] / 60 * coefmachine['coef_e'] * machine['d_h_creuses_e']
+                donnee['dhi'] = round(donnee['duree_machine_hc'] / 60 * coefmachine['coef_e'] * machine['d_h_creuses_e'],2)
             else:
                 donnee['dhi'] = 0
             donnee['mm'] = donnee['mai'] + donnee['moi']
