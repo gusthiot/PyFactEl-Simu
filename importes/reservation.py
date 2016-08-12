@@ -123,11 +123,11 @@ class Reservation(Fichier):
                                                                      donnee['duree_hc'])
 
             if code_client not in self.sommes:
-                self.sommes[code_client] = {}
+                self.sommes[code_client] = {'comptes': {}, 'machines': {}}
             scl = self.sommes[code_client]
-            if id_compte not in scl:
-                scl[id_compte] = {}
-            sco = scl[id_compte]
+            if id_compte not in scl['comptes']:
+                scl['comptes'][id_compte] = {}
+            sco = scl['comptes'][id_compte]
             if id_machine not in sco:
                 sco[id_machine] = {'res_hp': 0, 'ann_hp': 0,
                                 'res_hc': 0, 'ann_hc': 0}
@@ -139,10 +139,10 @@ class Reservation(Fichier):
                 sco[id_machine]['res_hp'] += duree_fact_hp
                 sco[id_machine]['res_hc'] += duree_fact_hc
 
-            if id_machine not in scl:
+            if id_machine not in scl['machines']:
                 pu_hp = round(coefmachine['coef_r'] * machine['t_h_reservation_hp'], 2)
                 pu_hc = round(coefmachine['coef_r'] * machine['t_h_reservation_hc'], 2)
-                scl[id_machine] = {'pu_hp': pu_hp, 'pu_hc': pu_hc}
+                scl['machines'][id_machine] = {'pu_hp': pu_hp, 'pu_hc': pu_hc}
 
             donnee['duree_fact_hp'] = duree_fact_hp
             donnee['duree_fact_hc'] = duree_fact_hc

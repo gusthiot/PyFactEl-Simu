@@ -186,6 +186,7 @@ class Sommes(object):
                         somme['somme_j_mm'] += projet['somme_p_mm']
                         somme['somme_j_mr'] += projet['somme_p_mr']
                         somme['mj'] += projet['mp']
+                        somme['res'] = {}
 
                         for categorie in self.categories:
                             somme['sommes_cat_m'][categorie] += projet['sommes_cat_m'][categorie]
@@ -198,14 +199,21 @@ class Sommes(object):
                     if tot > 0:
                         somme['si_facture'] = 1
 
-                    somme['res'] = {}
+            # réservations
+            for code_client in reservations.sommes:
+                for id_compte in reservations.sommes[code_client]['comptes']:
+                    if code_client not in spco:
+                        spco[code_client] = {}
+                    spco_cl = spco[code_client]
+                    if id_compte not in spco_cl:
+                        spco_cl[id_compte] = self.nouveau_somme(Sommes.cles_somme_compte)
+                        spco_cl[id_compte]['res'] = {}
+                    somme = spco_cl[id_compte]
                     machines_utilisees = []
-                    somme_res = {}
-                    if code_client in reservations.sommes:
-                        if id_compte in reservations.sommes[code_client]:
-                            somme_res = reservations.sommes[code_client][id_compte]
-                            for key in somme_res.keys():
-                                machines_utilisees.append(key)
+                    somme_res = reservations.sommes[code_client]['comptes'][id_compte]
+                    for key in somme_res.keys():
+                        machines_utilisees.append(key)
+
                     somme_cae = {}
                     if code_client in acces.sommes:
                         if id_compte in acces.sommes[code_client]:
@@ -215,10 +223,8 @@ class Sommes(object):
                                     machines_utilisees.append(key)
                     for mach_u in machines_utilisees:
                         if mach_u in somme_res:
-                            mini_hp = (somme_res[mach_u]['res_hp'] + somme_res[mach_u]['ann_hp']) * \
-                                                                    machines.donnees[mach_u]['tx_occ_eff_hp'] / 100
-                            mini_hc = (somme_res[mach_u]['res_hc'] + somme_res[mach_u]['ann_hc']) * \
-                                                                    machines.donnees[mach_u]['tx_occ_eff_hc'] / 100
+                            mini_hp = (somme_res[mach_u]['res_hp'] + somme_res[mach_u]['ann_hp']) * machines.donnees[mach_u]['tx_occ_eff_hp'] / 100
+                            mini_hc = (somme_res[mach_u]['res_hc'] + somme_res[mach_u]['ann_hc']) * machines.donnees[mach_u]['tx_occ_eff_hc'] / 100
                         else:
                             mini_hp = 0
                             mini_hc = 0
@@ -359,10 +365,10 @@ class Sommes(object):
 
                 for id_mach, som_m in somme['res'].items():
                     if som_m['pen_hp'] > 0:
-                        som_m['m_hp'] += som_m['pen_hp'] * reservations.sommes[code_client][id_mach]['pu_hp']
+                        som_m['m_hp'] += som_m['pen_hp'] * reservations.sommes[code_client]['machines'][id_mach]['pu_hp']
                         somme['rm'] += som_m['m_hp']
                     if som_m['pen_hc'] > 0:
-                        som_m['m_hc'] += som_m['pen_hc'] * reservations.sommes[code_client][id_mach]['pu_hc']
+                        som_m['m_hc'] += som_m['pen_hc'] * reservations.sommes[code_client]['machines'][id_mach]['pu_hc']
                         somme['rm'] += som_m['m_hc']
 
                 somme['rr'] = Rabais.rabais_reservation_petit_montant(somme['rm'], self.min_fact_rese)
