@@ -1,6 +1,6 @@
 # PyFactEl-Simu
 
-(PyFactEl en mode simulation)
+(PyFactEl en mode simulation, version 2)
 
 - installer Python 3 (https://www.python.org/downloads/)
     si l'option "rajouter Python au PATH" se présente, la cocher
